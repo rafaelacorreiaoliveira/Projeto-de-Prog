@@ -4,7 +4,7 @@
 
 int row=9, column=9;
 char table[15][24];
-char pecas[42][3][3] = {
+char pecas[43][3][3] = {
     {{'1','-','-'}, {'-','-','-'}, {'-','-','-'}},
     {{'-','1','-'}, {'-','-','-'}, {'-','-','-'}},
     {{'-','-','1'}, {'-','-','-'}, {'-','-','-'}},
@@ -46,7 +46,8 @@ char pecas[42][3][3] = {
     {{'-','6','-'}, {'6','-','6'}, {'6','6','6'}},
     {{'7','-','7'}, {'7','7','7'}, {'7','-','7'}},
     {{'7','7','7'}, {'-','7','-'}, {'7','7','7'}},
-    {{'8','8','8'}, {'8','-','8'}, {'8','8','8'}}
+    {{'8','8','8'}, {'8','-','8'}, {'8','8','8'}},
+    {{'-','-','-'}, {'-','-','-'}, {'-','-','-'}},
 };
 
 void menu(void) {
@@ -90,7 +91,7 @@ void InicializacaoBoard() {
     //bottom row of letters
     printf("   ");
     for(i=0; i<column; i++) {
-        printf(" %c", letters[i]);
+        printf(" %c ", letters[i]);
     }
     printf("\n");
 
@@ -125,8 +126,52 @@ void printBoard() {
     printf("\n");
 }
 
+/* void vazio() {
+    int i1, i2, for3, for4;
+    char value;
+    time_t t;
+    srand((unsigned) time(&t));
+
+    do {
+        i1 = rand() % row;
+        i2 = rand() % column;
+    }while((i1%3 != 0) || (i2%3 != 0));
+
+                //Matriz 3x3 específica
+    for(for3=0; for3<3; for3++) {
+        for(for4=0; for4<3; for4++) {
+
+            value = pecas[i1][for3][for4];
+            table[for3+for1*3][for4+for2*3] = value;
+
+        }
+    }
+} */
+
+int rest_1(for1, for2) {
+
+    int i1;
+    int flag = 0;
+
+    if((for1==0) && (for2>0)) {
+        for(i1=0; i1<3; i1++) {
+            char check1 = table[i1][3*for2];
+            char check2 = table[i1][3*for2 - 1];
+
+            if(check1 != '-' && check2 != '-')
+                flag = 1;
+        }
+    }
+    return flag;
+}
+
+
 void pecas_() {
 
+    /* for1 - percorre matriz global de 3 em 3 linhas.
+       for2 - percorre matriz global de 3 em 3 colunas.
+       for3 - percorre natriz específica 3x3 por linhas.
+       for4 - percorre matriz específica 3x3 por colunas. */
     int for1, for2, for3, for4;
     char value;
     time_t t;
@@ -136,20 +181,31 @@ void pecas_() {
     for(for1=0; for1 < row/3; for1++) {
         for(for2=0; for2 < column/3; for2++) {
 
-            //Randomização de peças
-            int i1 = rand() % 42;
 
             //Matriz 3x3 específica
-            for(for3=0; for3<3; for3++) {
-                for(for4=0; for4<3; for4++) {
+            do {
+                // Randomização da peça
+                int i1 = rand() % 43;
 
-                    value = pecas[i1][for3][for4];
-                    table[for3+for1*3][for4+for2*3] = value;
+                for(for3=0; for3<3; for3++) {
+                    for(for4=0; for4<3; for4++) {
 
+                        value = pecas[i1][for3][for4];
+                        table[for3+for1*3][for4+for2*3] = value;
+
+                    }
                 }
-            }
+
+                rest_1(for1, for2);
+                int a = rest_1(for1, for2);
+            }while(rest_1(for1,for2));
         }
     }
+
+    /*do {
+        vazio(for1, for2);
+    }while((row*column)/9); */
+
 }
 
 int main() {
