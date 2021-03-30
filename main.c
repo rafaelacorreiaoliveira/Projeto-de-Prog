@@ -126,9 +126,11 @@ void printBoard() {
     printf("\n");
 }
 
-/* void vazio() {
-    int i1, i2, for3, for4;
-    char value;
+/*int rest_4() {
+    while(((row*column)/9 ) {
+
+    }
+    int i1, i2, for3, for4, flag=0;
     time_t t;
     srand((unsigned) time(&t));
 
@@ -137,31 +139,133 @@ void printBoard() {
         i2 = rand() % column;
     }while((i1%3 != 0) || (i2%3 != 0));
 
-                //Matriz 3x3 específica
+    //Matriz 3x3 específica
     for(for3=0; for3<3; for3++) {
         for(for4=0; for4<3; for4++) {
 
-            value = pecas[i1][for3][for4];
-            table[for3+for1*3][for4+for2*3] = value;
+            table[for3+i1*3][for4+i2*3] = '-';
 
         }
     }
+    return flag;
 } */
 
 int rest_1(for1, for2) {
 
-    int i1;
-    int flag = 0;
+    int i1, flag = 0;
+    char check1, check2, check3, check4;
 
+    /* for1 - percorre matriz global de 3 em 3 linhas.
+       for2 - percorre matriz global de 3 em 3 colunas. */
+
+    // if - Verifica as primeiras 3 linhas e todas as colunas a partir da 3º, caso as peças sejam inválidas, retorna 1.
     if((for1==0) && (for2>0)) {
         for(i1=0; i1<3; i1++) {
-            char check1 = table[i1][3*for2];
-            char check2 = table[i1][3*for2 - 1];
+            /* check1 - 1º coluna da matriz 3x3
+               check2 - 3º coluna da matriz 3x3 anterior */
+            check1 = table[i1][3*for2];
+            check2 = table[i1][3*for2 - 1];
 
+                // check3 - 3º coluna da matriz 3x3 anterior, linha superior.
+                if((i1-1) >= 0) {
+                    check3 = table[i1-1][3*for2 - 1]; }
+                else {
+                    check3 = '-'; }
+
+            check4 = table[i1+1][3*for2 - 1];
+
+            //Imediatamente atrás
             if(check1 != '-' && check2 != '-')
+                flag = 1;
+            //Diagonal superior
+            if(check1 != '-' && check3 != '-')
+                flag = 1;
+            //Diagonal inferior
+            if(check1 != '-' && check4 != '-')
                 flag = 1;
         }
     }
+
+    // if - Verifica primeiras 3 colunas depois das 3 linhas.
+    if((for1>0) && (for2 == 0)) {
+        for(i1=0; i1<3; i1++) {
+            check1 = table[for1*3][i1];
+            check2 = table[for1*3 - 1][i1];
+
+            //check3 - valor encima de check1, uma casa á esquerda.
+            if((i1-1) >= 0) {
+                check3 = table[for1*3][i1-1]; }
+            else {
+                check3 = '-'; }
+
+            check4 = table[for1*3][i1+1];
+
+            //Imediatamente acima
+            if(check1 != '-' && check2 != '-')
+                flag = 1;
+            //Diagonal inferior
+            if(check1 != '-' && check3 != '-')
+                flag = 1;
+            //Diagonal superior
+            if(check1 != '-' && check1 != '-')
+                flag = 1;
+        }
+    }
+
+    // if - Verifica o resto do tabuleiro.
+    if((for1>0) && for2>0) {
+        for(i1=0; i1<3; i1++) {
+            //Verificação da coluna anterior
+            check1 = table[i1 + for1*3][for2*3];
+            check2 = table[i1 + for1*3][for2*3 - 1];
+
+            //check3 - 3º coluna da matriz 3x3 anterior, linha superior.
+            check3 = table[i1 + for1*3 - 1][for2*3 - 1];
+
+            //check4 - 3º coluna da matriz 3x3 anterior, linha inferior.
+            if((for1*3 != row) && (i1 == 2)) {
+                check4 = table[i1 + for1*3 + 1][for2*3 - 1]; }
+            else {
+                check4 = '-'; }
+
+            //Imediatamente atrás
+            if(check1 != '-' && check2 != '-')
+                flag = 1;
+            //Diagonal superior
+            if(check1 != '-' && check3 != '-')
+                flag = 1;
+            //Diagonal inferior
+            if(check1 != '-' && check4 != '-')
+                flag = 1;
+        }
+        if(flag==0) {
+            for(i1=0; i1<3; i1++) {
+                //Verificação da linha superior
+                check1 = table[for1*3][i1 + for2*3];
+                check2 = table[for1*3 - 1][i1 + for2*3];
+
+                //check3 - linha superior, um bloco á direita
+                if((for2*3 != column) && (i1 == 2)) {
+                    check3 = table[for1*3 - 1][for2*3 + i1 + 1]; }
+                else {
+                    check3 = '-'; }
+
+                //check4 - linha superior, um bloca á esquerda
+                check4 = table[for1*3 - 1][for2*3 + i1 - 1];
+
+            //Imediatamente acima
+            if(check1 != '-' && check2 != '-')
+                flag = 1;
+            //Diagonal inferior
+            if(check1 != '-' && check3 != '-')
+                flag = 1;
+            //Diagonal superior
+            if(check1 != '-' && check4 != '-')
+                flag = 1;
+            }
+        }
+    }
+
     return flag;
 }
 
@@ -197,17 +301,24 @@ void pecas_() {
                 }
 
                 rest_1(for1, for2);
-                int a = rest_1(for1, for2);
             }while(rest_1(for1,for2));
         }
     }
 
     /*do {
-        vazio(for1, for2);
-    }while((row*column)/9); */
+        rest_4(for1, for2);
+    }while(rest_4(for1, for2)); */
 
 }
 
+
+int main() {
+    menu();
+    InicializacaoBoard();
+    pecas_();
+    printBoard();
+    return EXIT_SUCCESS;
+}
 int main() {
     menu();
     InicializacaoBoard();
