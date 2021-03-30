@@ -319,10 +319,3 @@ int main() {
     printBoard();
     return EXIT_SUCCESS;
 }
-int main() {
-    menu();
-    InicializacaoBoard();
-    pecas_();
-    printBoard();
-    return EXIT_SUCCESS;
-}
