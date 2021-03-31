@@ -126,7 +126,7 @@ void printBoard() {
     printf("\n");
 }
 
-/*int rest_4() {
+/* int rest_4() {
     while(((row*column)/9 ) {
 
     }
@@ -150,15 +150,15 @@ void printBoard() {
     return flag;
 } */
 
-int rest_1(for1, for2) {
+int restricao_1(for1, for2) {
 
     int i1, flag = 0;
     char check1, check2, check3, check4;
 
-    /* for1 - percorre matriz global de 3 em 3 linhas.
-       for2 - percorre matriz global de 3 em 3 colunas. */
+    /* for1 - percorre matriz global de 3 em 3 linhas
+       for2 - percorre matriz global de 3 em 3 colunas */
 
-    // if - Verifica as primeiras 3 linhas e todas as colunas a partir da 3º, caso as peças sejam inválidas, retorna 1.
+    // if - Verifica as primeiras 3 linhas e todas as colunas a partir da 3º
     if((for1==0) && (for2>0)) {
         for(i1=0; i1<3; i1++) {
             /* check1 - 1º coluna da matriz 3x3
@@ -166,47 +166,47 @@ int rest_1(for1, for2) {
             check1 = table[i1][3*for2];
             check2 = table[i1][3*for2 - 1];
 
-                // check3 - 3º coluna da matriz 3x3 anterior, linha superior.
+                // check3 - 3º coluna da matriz 3x3 anterior, linha superior
                 if((i1-1) >= 0) {
-                    check3 = table[i1-1][3*for2 - 1]; }
+                    check3 = table[i1 - 1][3*for2 - 1]; }
                 else {
                     check3 = '-'; }
 
-            check4 = table[i1+1][3*for2 - 1];
+            // check4 - 3º coluna da matriz 3x3 anterior, linha inferior
+            check4 = table[i1 + 1][3*for2 - 1];
 
-            //Imediatamente atrás
+            // condições de peça inválida
             if(check1 != '-' && check2 != '-')
                 flag = 1;
-            //Diagonal superior
             if(check1 != '-' && check3 != '-')
                 flag = 1;
-            //Diagonal inferior
             if(check1 != '-' && check4 != '-')
                 flag = 1;
         }
     }
 
-    // if - Verifica primeiras 3 colunas depois das 3 linhas.
+    // if - Verifica primeiras 3 colunas depois das primeiras 3 linhas
     if((for1>0) && (for2 == 0)) {
         for(i1=0; i1<3; i1++) {
+            /* check1 - 1º linha da matriz 3x3
+               check2 - 3º linha da matriz 3x3 anterior */
             check1 = table[for1*3][i1];
             check2 = table[for1*3 - 1][i1];
 
-            //check3 - valor encima de check1, uma casa á esquerda.
+            // check3 - linha superior, um bloco á esquerda
             if((i1-1) >= 0) {
-                check3 = table[for1*3][i1-1]; }
+                check3 = table[for1*3 - 1][i1-1]; }
             else {
                 check3 = '-'; }
 
-            check4 = table[for1*3][i1+1];
+            // check4 - linha superior, uma bloco á direita
+            check4 = table[for1*3 - 1][i1+1];
 
-            //Imediatamente acima
+            // condições de peça inválida
             if(check1 != '-' && check2 != '-')
                 flag = 1;
-            //Diagonal inferior
             if(check1 != '-' && check3 != '-')
                 flag = 1;
-            //Diagonal superior
             if(check1 != '-' && check1 != '-')
                 flag = 1;
         }
@@ -215,37 +215,39 @@ int rest_1(for1, for2) {
     // if - Verifica o resto do tabuleiro.
     if((for1>0) && for2>0) {
         for(i1=0; i1<3; i1++) {
-            //Verificação da coluna anterior
+            /*  Verificação das 4 casas da coluna anterior
+                check1 - 1º coluna da matriz 3x3
+                check2 - 3º coluna da matriz 3x3 anterior */
             check1 = table[i1 + for1*3][for2*3];
             check2 = table[i1 + for1*3][for2*3 - 1];
 
-            //check3 - 3º coluna da matriz 3x3 anterior, linha superior.
+            // check3 - 3º coluna da matriz 3x3 anterior, linha superior
             check3 = table[i1 + for1*3 - 1][for2*3 - 1];
 
-            //check4 - 3º coluna da matriz 3x3 anterior, linha inferior.
-            if((for1*3 != row) && (i1 == 2)) {
+            // check4 - 3º coluna da matriz 3x3 anterior, linha inferior
+            if((for1*3 + i1) != (row + 2)) {
                 check4 = table[i1 + for1*3 + 1][for2*3 - 1]; }
             else {
                 check4 = '-'; }
 
-            //Imediatamente atrás
+            // condições de peça inválida
             if(check1 != '-' && check2 != '-')
                 flag = 1;
-            //Diagonal superior
             if(check1 != '-' && check3 != '-')
                 flag = 1;
-            //Diagonal inferior
             if(check1 != '-' && check4 != '-')
                 flag = 1;
         }
         if(flag==0) {
             for(i1=0; i1<3; i1++) {
-                //Verificação da linha superior
+                /*  Verificação das 5 casas da linha superior
+                    check1 - 1º linha da matriz 3x3
+                    check2 - 3º linha da matriz 3x3 anterior */
                 check1 = table[for1*3][i1 + for2*3];
                 check2 = table[for1*3 - 1][i1 + for2*3];
 
                 //check3 - linha superior, um bloco á direita
-                if((for2*3 != column) && (i1 == 2)) {
+                if((for2*3 + i1) != (column + 2)) {
                     check3 = table[for1*3 - 1][for2*3 + i1 + 1]; }
                 else {
                     check3 = '-'; }
@@ -253,13 +255,11 @@ int rest_1(for1, for2) {
                 //check4 - linha superior, um bloca á esquerda
                 check4 = table[for1*3 - 1][for2*3 + i1 - 1];
 
-            //Imediatamente acima
+            // condições de peça inválida
             if(check1 != '-' && check2 != '-')
                 flag = 1;
-            //Diagonal inferior
             if(check1 != '-' && check3 != '-')
                 flag = 1;
-            //Diagonal superior
             if(check1 != '-' && check4 != '-')
                 flag = 1;
             }
@@ -300,8 +300,8 @@ void pecas_() {
                     }
                 }
 
-                rest_1(for1, for2);
-            }while(rest_1(for1,for2));
+                restricao_1(for1, for2);
+            }while(restricao_1(for1,for2));
         }
     }
 
