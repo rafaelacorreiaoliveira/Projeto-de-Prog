@@ -3,6 +3,9 @@
 #include <time.h>
 
 int row=9, column=9;
+int tipo [9] = {0,0,0,0,0,0,0,0,0};
+// DECLAREI PEÇA COMO GLOBAL PQ NAO SABIA COMO CONTORNAR O PROBLEMA DA RESTRIÇÃO 3, MUDAR SE POSSÍVEL
+int peca;
 char table[15][24];
 char pecas[43][3][3] = {
     {{'1','-','-'}, {'-','-','-'}, {'-','-','-'}},
@@ -50,32 +53,57 @@ char pecas[43][3][3] = {
     {{'-','-','-'}, {'-','-','-'}, {'-','-','-'}},
 };
 
-int menu() {
+/**
+ *  Nome: menu
+ *  Objetivo: obter a partir do utilizador o tamanho do tabuleiro a ser utilizado
+ *
+ *  Parametros de entrada: n/a
+ *  Parametros de saida: n/a
+ */
 
-    int modo_pecas=0;
-
-    //escolher tamanho
+void menu() {
     do {
-        printf("\n\n\t|Enter the size of your desired playing field|\n\n --> Must be in multiples of three. Rows (9-15) x Columns (9-24): ");
+        printf("\n\n\t|Insira o tamanho do campo de jogo desejado|\n\n --> Input deverá ser múltiplo de 3. Linhas (9-15) x Colunas (9-24): ");
         if(scanf("%i %i", &row, &column) != 2) {
-            printf("\n\tINVALID INPUT - TRY AGAIN");
-            scanf("%*s");
+            printf("\n\tInválido, tente novamente.");
+            scanf("%*c");
         }
         system("clear");
     } while((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0));
+}
+
+/**
+ *  Nome: pos
+ *  Objetivo: obter a partir do utilizador o tipo de posicionamento de peças
+ *
+ *  Parametros de entrada: n/a
+ *  Parametros de saida: modo_pecas
+ */
+
+int pos() {
+
+    int modo_pecas=0;
 
     do {
-        printf("\n\n\t|Modos de posicionamento de peças|\n\n\t1. Aleatório.\n\t2. p2 \n\n\tEscolha: ");
+        printf("\n\n\t|Modos de posicionamento de peças|\n\n\t1. Aleatório.\n\t2. Escolha \n\n\tEscolha: ");
         if(scanf("%i", &modo_pecas) != 1) {
             printf("\n\tInválido, tente novamente.");
             scanf("%*s");
         }
         system("clear");
-        // fazer restricao
-    } while(!(modo_pecas >= 1));
 
-    return(modo_pecas);
+    } while(modo_pecas < 1 || modo_pecas > 2);
+
+    return modo_pecas;
 }
+
+/**
+ *  Nome: printBoard
+ *  Objetivo: representar no ecrã valores previamente carregados no tabuleiro
+ *
+ *  Parametros de entrada: n/a
+ *  Parametros de saida: n/a
+ */
 
 void printBoard() {
 
@@ -106,40 +134,15 @@ void printBoard() {
     printf("\n");
 }
 
-/* int rest_4() {
-    while(((row*column)/9 ) {
-
-    }
-    int i1, i2, for3, for4, flag=0;
-    time_t t;
-    srand((unsigned) time(&t));
-
-    do {
-        i1 = rand() % row;
-        i2 = rand() % column;
-    }while((i1%3 != 0) || (i2%3 != 0));
-
-    //Matriz 3x3 específica
-    for(for3=0; for3<3; for3++) {
-        for(for4=0; for4<3; for4++) {
-
-            table[for3+i1*3][for4+i2*3] = '-';
-
-        }
-    }
-    return flag;
-} */
-
-/** \Nome da função: restrição_1
+/**
+ *  Nome: restricao_1
+ *  Objetivo: implementar a restrição 1 relativamente á disposição das peças
  *
- * \Obejtivo: implementar a restrição 1
- * \Parametros de entrada: for1, for2
- * \Paremetros de saida: nenhums
- *
+ *  Parametros de entrada: for1, for2, modo_pecas
+ *  Paremetros de saida: n/a
  */
 
-
-int restricao_1(for1, for2) {
+int restricao_1(for1, for2, modo_pecas) {
 
     int i1, flag = 0;
     char check1, check2, check3, check4;
@@ -255,36 +258,38 @@ int restricao_1(for1, for2) {
         }
     }
 
+    if (flag == 1 && modo_pecas == 2)
+        tipo[peca]++;
+
     return flag;
 }
 
-/** \Nome da função: restrição_3
+/**
+ *  Nome: escolha_pecas
+ *  Objetivo: obter a partir do utilizador as peças a introduzir no tabuleiro
  *
- * \Obejtivo: implementar a restrição 3
- * \Parametros de entrada:
- * \Paremetros de saida:
- *
+ *  Parametros de entrada: n/a
+ *  Paremetros de saida:
  */
 
-int restricao_3(a, modo_pecas) {
+void escolha_pecas() {
 
-    int i1, soma=0, tipo[9] = {0,0,0,0,0,0,0,0,0}, controlo, peca;
-    srand(time(NULL));
+    int i1, controlo=0, soma=0;
 
     do {
         printf("\n - Insira o número de peças desejado por ordem de tamanho (1,2,3,4,5,6,7,8): \n\n --> ");
         for(i1=1; i1<9; i1++) {
             if(scanf("%i", &tipo[i1]) != 1){
                 printf("\n\tInválido, tente novamente.");
-                i1--;
-                soma -= i1;
                 scanf("%*s");
-                system("clear");
-                printf("\n - Insira o número de peças desejado por ordem de tamanho (1,2,3,4,5,6,7,8): \n\n --> ");
+                soma = 0;
+                break;
             }
-            soma += i1;
+            soma += tipo[i1];
         }
+        system("clear");
 
+        // Verifica se alguma peça de tipo superior têm mais repetições que a anterior
         if(tipo[1] < tipo[2])
             controlo = 1;
         if(tipo[2] < tipo[3])
@@ -298,67 +303,77 @@ int restricao_3(a, modo_pecas) {
         if(tipo[7] < tipo[8])
             controlo = 1;
 
-        tipo[0] = (row*column)/18;
+        // Espaços a preencher com matrizes vazias
+        tipo[0] = (row*column)/9-tipo[1]-tipo[2]-tipo[3]-tipo[4]-tipo[5]-tipo[6]-tipo[7]-tipo[8];
 
-    } while((controlo != 0) && (soma != (row*column)/18));
+    } while((controlo != 0) && (soma < (row*column)/18));
+}
+
+/**
+ *  Nome: restricao_3
+ *  Objetivo: implementar a restrição 3 relativamente á disposição das peças
+ *
+ *  Parametros de entrada: a, modo_pecas
+ *  Paremetros de saida: n/a
+ */
+
+int restricao_3(a, modo_pecas) {
+
+    int peca;
+    srand(time(NULL));
 
     peca = rand() % 9;
 
-    do {
-        if (peca == 0) {
-            a = 42;
-
-        }
-        else if (peca == 1) {
-            a = rand() % 8;
-            tipo[peca] -= 1;
-        }
-        else if (peca == 2) {
-            a = rand() % 12 + 8;
-            tipo[peca] -= 1;
-        }
-        else if (peca == 3) {
-            a = rand() % 6 + 20;
-            tipo[peca] -= 1;
-        }
-        else if (peca == 4) {
-            a = rand() % 4 + 26;
-            tipo[peca] -= 1;
-        }
-        else if (peca == 5) {
-            a = rand() % 4 + 30;
-            tipo[peca] -= 1;
-        }
-        else if (peca == 6) {
-            a = rand() % 4 + 34;
-            tipo[peca] -= 1;
-        }
-        else if (peca == 7) {
-            a = rand() % 2 + 38;
-            tipo[peca] -= 1;
-        }
-        else if (peca == 8) {
-            a = 41;
-            tipo[peca] -= 1;
-        }
-
-    } while((tipo[1] != 0) && (tipo[2] != 0) && (tipo[3] != 0) && (tipo[4] != 0) && (tipo[5] != 0) && (tipo[6] != 0) && (tipo[7] != 0) && (tipo[8] != 0) && (tipo[9] != 0));
-
+    if (peca == 0) {
+        a = 42;
+        tipo[peca]--;
+    }
+    else if (peca == 1) {
+        a = rand() % 8;
+        tipo[peca]--;
+    }
+    else if (peca == 2) {
+        a = rand() % 12 + 8;
+        tipo[peca]--;
+    }
+    else if (peca == 3) {
+        a = rand() % 6 + 20;
+        tipo[peca]--;
+    }
+    else if (peca == 4) {
+        a = rand() % 4 + 26;
+        tipo[peca]--;;
+    }
+    else if (peca == 5) {
+        a = rand() % 4 + 30;
+        tipo[peca]--;
+    }
+    else if (peca == 6) {
+        a = rand() % 4 + 34;
+        tipo[peca]--;
+    }
+    else if (peca == 7) {
+        a = rand() % 2 + 38;
+        tipo[peca]--;
+    }
+    else if (peca == 8) {
+        a = 41;
+        tipo[peca]--;
+    }
 
     return a;
 }
 
 
-/** \Nome da função: modo
+/**
+ *  Nome: modo
+ *  Objetivo: correr o programa de acordo com o modo selecionado
  *
- * \Obejtivo: correr o programa
- * \Parametros de entrada: modo_pecas
- * \Paremetros de saida: nenhum
- *
+ *  Parametros de entrada: n/a
+ *  Paremetros de saida: n/a
  */
 
-
-void modo(modo_pecas) {
+void modo() {
 
     /* for1 - percorre matriz global de 3 em 3 linhas.
        for2 - percorre matriz global de 3 em 3 colunas.
@@ -369,21 +384,27 @@ void modo(modo_pecas) {
     time_t t;
     srand((unsigned) time(&t));
 
+    // Retira o modo de posicionamento de peças
+    int modo_pecas = pos();
+
     //Percorre a matriz em blocos 3x3
     for(for1=0; for1 < row/3; for1++) {
         for(for2=0; for2 < column/3; for2++) {
 
             // Modo p2
-            if(modo_pecas == 2) {
-                restricao_3();
-            }
+            if(modo_pecas == 2)
+                escolha_pecas();
 
             //Matriz 3x3 específica
             do {
+
                 // Modo p1
-                if (modo_pecas == 1) {
+                if (modo_pecas == 1)
                     a = rand() % 43;
-                }
+
+                // Modo p2
+                if(modo_pecas == 2)
+                    a = restricao_3();
 
                 for(for3=0; for3<3; for3++) {
                     for(for4=0; for4<3; for4++) {
@@ -398,17 +419,18 @@ void modo(modo_pecas) {
             }while(restricao_1(for1,for2));
         }
     }
-
-    /*do {
-        rest_4(for1, for2);
-    }while(rest_4(for1, for2)); */
-
 }
 
-void modo_p2() {
-}
+/**
+ *  Nome: main
+ *  Objetivo: chamar outras funções, completar o programa
+ *
+ *  Parametros de entrada: n/a
+ *  Paremetros de saida: n/a
+ */
 
 int main() {
+
     menu();
     modo();
     printBoard();
