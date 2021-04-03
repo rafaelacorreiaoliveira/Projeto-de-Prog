@@ -5,7 +5,7 @@
 int row=9, column=9;
 int tipo [9] = {0,0,0,0,0,0,0,0,0};
 // DECLAREI PEÇA COMO GLOBAL PQ NAO SABIA COMO CONTORNAR O PROBLEMA DA RESTRIÇÃO 3, MUDAR SE POSSÍVEL
-int peca;
+int peca, a;
 char table[15][24];
 char pecas[43][3][3] = {
     {{'1','-','-'}, {'-','-','-'}, {'-','-','-'}},
@@ -204,7 +204,7 @@ int restricao_1(for1, for2, modo_pecas) {
         }
     }
 
-    // if - Verifica o resto do tabuleiro.
+    // if - Verifica o resto do tabuleiro
     if((for1>0) && for2>0) {
         for(i1=0; i1<3; i1++) {
             /*  Verificação das 4 casas da coluna anterior
@@ -217,7 +217,7 @@ int restricao_1(for1, for2, modo_pecas) {
             check3 = table[i1 + for1*3 - 1][for2*3 - 1];
 
             // check4 - 3º coluna da matriz 3x3 anterior, linha inferior
-            if((for1*3 + i1) != (row + 2)) {
+            if((for1*3 + i1) != (row - 1)) {
                 check4 = table[i1 + for1*3 + 1][for2*3 - 1]; }
             else {
                 check4 = '-'; }
@@ -239,7 +239,7 @@ int restricao_1(for1, for2, modo_pecas) {
                 check2 = table[for1*3 - 1][i1 + for2*3];
 
                 //check3 - linha superior, um bloco á direita
-                if((for2*3 + i1) != (column + 2)) {
+                if((for2*3 + i1) != (column - 1)) {
                     check3 = table[for1*3 - 1][for2*3 + i1 + 1]; }
                 else {
                     check3 = '-'; }
@@ -247,13 +247,13 @@ int restricao_1(for1, for2, modo_pecas) {
                 //check4 - linha superior, um bloca á esquerda
                 check4 = table[for1*3 - 1][for2*3 + i1 - 1];
 
-            // condições de peça inválida
-            if(check1 != '-' && check2 != '-')
-                flag = 1;
-            if(check1 != '-' && check3 != '-')
-                flag = 1;
-            if(check1 != '-' && check4 != '-')
-                flag = 1;
+                // condições de peça inválida
+                if(check1 != '-' && check2 != '-')
+                    flag = 1;
+                if(check1 != '-' && check3 != '-')
+                    flag = 1;
+                if(check1 != '-' && check4 != '-')
+                    flag = 1;
             }
         }
     }
@@ -277,36 +277,42 @@ void escolha_pecas() {
     int i1, controlo=0, soma=0;
 
     do {
-        printf("\n - Insira o número de peças desejado por ordem de tamanho (1,2,3,4,5,6,7,8): \n\n --> ");
+        printf("\n - Insira o número de peças desejado por ordem de tamanho (1,2,3,4,5,6,7,8):\n\n");
         for(i1=1; i1<9; i1++) {
+            printf("\tPeça %i - ", i1);
             if(scanf("%i", &tipo[i1]) != 1){
-                printf("\n\tInválido, tente novamente.");
+                printf("\n\tInválido, tente novamente (Entrada não reconhecida).");
                 scanf("%*s");
                 soma = 0;
+                controlo = 1;
+                break;
+            }
+            // Restrição 4
+            if(soma > (row*column/18)) {
+                printf("\n\tInválido, tente novamente (Reduza o número de peças).");
+                scanf("%*s");
+                soma = 0;
+                controlo = 1;
                 break;
             }
             soma += tipo[i1];
         }
-        system("clear");
-
         // Verifica se alguma peça de tipo superior têm mais repetições que a anterior
-        if(tipo[1] < tipo[2])
-            controlo = 1;
-        if(tipo[2] < tipo[3])
-            controlo = 1;
-        if(tipo[3] < tipo[4])
-            controlo = 1;
-        if(tipo[5] < tipo[6])
-            controlo = 1;
-        if(tipo[6] < tipo[7])
-            controlo = 1;
-        if(tipo[7] < tipo[8])
-            controlo = 1;
+        for(i1=1; i1<8; i1++) {
+            if(tipo[i1] < tipo[i1+1]) {
+                printf("\n\tInválido, tente novamente (Ordem introduzida de peças incorreta).");
+                scanf("%*s");
+                soma = 0;
+                controlo = 1;
+            }
+
+        }
+        system("clear");
 
         // Espaços a preencher com matrizes vazias
         tipo[0] = (row*column)/9-tipo[1]-tipo[2]-tipo[3]-tipo[4]-tipo[5]-tipo[6]-tipo[7]-tipo[8];
 
-    } while((controlo != 0) && (soma < (row*column)/18));
+    } while(controlo == 1);
 }
 
 /**
@@ -317,43 +323,38 @@ void escolha_pecas() {
  *  Paremetros de saida: n/a
  */
 
-int restricao_3(a, modo_pecas) {
-
-    int peca;
-    srand(time(NULL));
-
-    peca = rand() % 9;
+int restricao_3(int modo_pecas) {
 
     if (peca == 0) {
         a = 42;
         tipo[peca]--;
     }
     else if (peca == 1) {
-        a = rand() % 8;
+        a = rand() % 9;
         tipo[peca]--;
     }
     else if (peca == 2) {
-        a = rand() % 12 + 8;
+        a = rand() % 12 + 9;
         tipo[peca]--;
     }
     else if (peca == 3) {
-        a = rand() % 6 + 20;
+        a = rand() % 6 + 21;
         tipo[peca]--;
     }
     else if (peca == 4) {
-        a = rand() % 4 + 26;
-        tipo[peca]--;;
+        a = rand() % 4 + 27;
+        tipo[peca]--;
     }
     else if (peca == 5) {
-        a = rand() % 4 + 30;
+        a = rand() % 4 + 31;
         tipo[peca]--;
     }
     else if (peca == 6) {
-        a = rand() % 4 + 34;
+        a = rand() % 4 + 35;
         tipo[peca]--;
     }
     else if (peca == 7) {
-        a = rand() % 2 + 38;
+        a = rand() % 2 + 39;
         tipo[peca]--;
     }
     else if (peca == 8) {
@@ -379,21 +380,20 @@ void modo() {
        for2 - percorre matriz global de 3 em 3 colunas.
        for3 - percorre natriz específica 3x3 por linhas.
        for4 - percorre matriz específica 3x3 por colunas. */
-    int for1, for2, for3, for4, a;
-    char value;
+    int for1, for2, for3, for4;
     time_t t;
     srand((unsigned) time(&t));
 
     // Retira o modo de posicionamento de peças
     int modo_pecas = pos();
 
+    // Modo p2
+    if(modo_pecas == 2)
+        escolha_pecas();
+
     //Percorre a matriz em blocos 3x3
     for(for1=0; for1 < row/3; for1++) {
         for(for2=0; for2 < column/3; for2++) {
-
-            // Modo p2
-            if(modo_pecas == 2)
-                escolha_pecas();
 
             //Matriz 3x3 específica
             do {
@@ -403,20 +403,24 @@ void modo() {
                     a = rand() % 43;
 
                 // Modo p2
-                if(modo_pecas == 2)
-                    a = restricao_3();
+                if(modo_pecas == 2) {
+                    do {
+                        peca = rand()%9;
+                    }while(tipo[peca] == 0);
+
+                    a = restricao_3(modo_pecas);
+                }
 
                 for(for3=0; for3<3; for3++) {
                     for(for4=0; for4<3; for4++) {
 
-                        value = pecas[a][for3][for4];
-                        table[for3+for1*3][for4+for2*3] = value;
+                        table[for3+for1*3][for4+for2*3] = pecas[a][for3][for4];
 
                     }
                 }
 
-                restricao_1(for1, for2);
-            }while(restricao_1(for1,for2));
+                //restricao_1(for1, for2, modo_pecas);
+            }while(restricao_1(for1,for2, modo_pecas));
         }
     }
 }
