@@ -7,6 +7,8 @@ int tipo [9] = {0,0,0,0,0,0,0,0,0};
 // DECLAREI PEÇA COMO GLOBAL PQ NAO SABIA COMO CONTORNAR O PROBLEMA DA RESTRIÇÃO 3, MUDAR SE POSSÍVEL
 int peca, a;
 char table[15][24];
+char table_p[15][24];
+
 char pecas[43][3][3] = {
     {{'1','-','-'}, {'-','-','-'}, {'-','-','-'}},
     {{'-','1','-'}, {'-','-','-'}, {'-','-','-'}},
@@ -54,14 +56,14 @@ char pecas[43][3][3] = {
 };
 
 /**
- *  Nome: menu
+ *  Nome: tamanho_jogo
  *  Objetivo: obter a partir do utilizador o tamanho do tabuleiro a ser utilizado
  *
  *  Parametros de entrada: n/a
  *  Parametros de saida: n/a
  */
 
-void menu() {
+void tamanho_jogo() {
     do {
         printf("\n\n\t|Insira o tamanho do campo de jogo desejado|\n\n --> Input deverá ser múltiplo de 3. Linhas (9-15) x Colunas (9-24): ");
         if(scanf("%i %i", &row, &column) != 2) {
@@ -70,6 +72,22 @@ void menu() {
         }
         system("clear");
     } while((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0));
+}
+
+int modo_jogo() {
+
+    int jogo;
+
+    do {
+        printf("\n\n\t|Insira o modo de jogo desejado|\n\n\t0.Aleatório\n\t1.Disparo\n\t2.Computador \n\n\t--> ");
+        if(scanf("%i", &jogo) != 1) {
+            printf("\n\tInválido, tente novamente.");
+            scanf("%*c");
+        }
+        system("clear");
+    } while(jogo != 0 && jogo != 1 && jogo != 2);
+
+    return jogo;
 }
 
 /**
@@ -113,17 +131,36 @@ void printBoard() {
 
     //display da matriz na consola + column of numbers
     int num = row;
-    for (i = 0; i < row; i++) {
-        if(num<10)
-            printf("  %i", num);
-        else
-            printf(" %i", num);
+    int jogo = modo_jogo();
 
-        for (i2 = 0; i2 < column; i2++) {
-            printf(" %c", table [i][i2]);
+    if(jogo == 0) {
+        for (i = 0; i < row; i++) {
+            if(num<10)
+                printf("  %i", num);
+            else
+                printf(" %i", num);
+
+            for (i2 = 0; i2 < column; i2++) {
+                printf(" %c", table[i][i2]);
+            }
+            num--;
+            printf("\n");
         }
-        num--;
-    printf("\n");
+    }
+    if(jogo == 1) {
+        modo_j1();
+        for (i = 0; i < row; i++) {
+            if(num<10)
+                printf("  %i", num);
+            else
+                printf(" %i", num);
+
+            for (i2 = 0; i2 < column; i2++) {
+                printf(" %c", table_p[i][i2]);
+            }
+            num--;
+            printf("\n");
+        }
     }
 
     //bottom row of letters
@@ -433,10 +470,35 @@ void modo() {
  *  Paremetros de saida: n/a
  */
 
-int main() {
+void modo_j1() {
 
-    menu();
+    int i1, i2, disparo_linha;
+    char disparo_coluna;
+    //Inicializar o tabuleiro de jogo a '-'
+    for(i1 = 0; i1 < row; i1++) {
+        for (i2 = 0; i2 < column; i2++) {
+            table_p[i1][i2] = ' ';
+        }
+    }
+
+    //do {
+        printf("\n\t - Insira as coordenadas de disparo (coluna-linha): ");
+        scanf(" %c %i", &disparo_coluna, &disparo_linha);
+
+        table_p[row - disparo_linha - 2][disparo_coluna - 17] = table[row - disparo_linha - 2][disparo_coluna - 17];
+        //printBoard();
+
+    //}while( );
+
+
+
+}
+
+int main() {
+    tamanho_jogo();
     modo();
     printBoard();
+    //modo_j1();
     return EXIT_SUCCESS;
 }
+
