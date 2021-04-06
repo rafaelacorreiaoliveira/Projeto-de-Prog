@@ -5,7 +5,7 @@
 int row=9, column=9;
 int tipo [9] = {0,0,0,0,0,0,0,0,0};
 // DECLAREI PEÇA COMO GLOBAL PQ NAO SABIA COMO CONTORNAR O PROBLEMA DA RESTRIÇÃO 3, MUDAR SE POSSÍVEL
-int peca, a;
+int peca;
 char table[15][24];
 char table_p[15][24];
 
@@ -55,6 +55,31 @@ char pecas[43][3][3] = {
     {{'-','-','-'}, {'-','-','-'}, {'-','-','-'}},
 };
 
+
+/**
+ *  Nome: jogo_select
+ *  Objetivo: obter a partir do utilizador o modo de jogo que o programa irá executar
+ *
+ *  Parametros de entrada: n/a
+ *  Parametros de saida: jogo
+ */
+
+int jogo_select() {
+
+    int jogo;
+
+    do {
+        printf("\n\n\t|Insira o modo de jogo desejado|\n\n\t0.Aleatório\n\t1.Disparo\n\t2.Computador \n\n\t--> ");
+        if(scanf("%i", &jogo) != 1) {
+            printf("\n\tInválido, tente novamente.");
+            scanf("%*c");
+        }
+        system("clear");
+    } while(jogo != 0 && jogo != 1 && jogo != 2);
+
+    return jogo;
+}
+
 /**
  *  Nome: tamanho_jogo
  *  Objetivo: obter a partir do utilizador o tamanho do tabuleiro a ser utilizado
@@ -74,31 +99,16 @@ void tamanho_jogo() {
     } while((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0));
 }
 
-int modo_jogo() {
-
-    int jogo;
-
-    do {
-        printf("\n\n\t|Insira o modo de jogo desejado|\n\n\t0.Aleatório\n\t1.Disparo\n\t2.Computador \n\n\t--> ");
-        if(scanf("%i", &jogo) != 1) {
-            printf("\n\tInválido, tente novamente.");
-            scanf("%*c");
-        }
-        system("clear");
-    } while(jogo != 0 && jogo != 1 && jogo != 2);
-
-    return jogo;
-}
 
 /**
- *  Nome: pos
+ *  Nome: pos_select
  *  Objetivo: obter a partir do utilizador o tipo de posicionamento de peças
  *
  *  Parametros de entrada: n/a
  *  Parametros de saida: modo_pecas
  */
 
-int pos() {
+int pos_select() {
 
     int modo_pecas=0;
 
@@ -117,56 +127,69 @@ int pos() {
 
 /**
  *  Nome: printBoard
- *  Objetivo: representar no ecrã valores previamente carregados no tabuleiro
+ *  Objetivo: representar no ecrã valores previamente carregados no tabuleiro dedicado ao correto modo de jogo
  *
  *  Parametros de entrada: n/a
  *  Parametros de saida: n/a
  */
 
-void printBoard() {
+void printBoard(modo_pecas) {
 
     system("clear");
-    int i, i2;
+    int i1, i2;
     char letters[] = "ABCDEFGHIJKLMNOQPRSTUVWX";
 
     //display da matriz na consola + column of numbers
     int num = row;
-    int jogo = modo_jogo();
 
+    // busca modo de jogo
+    int jogo = jogo_select();
+
+    // Tipos de peça no modo p1
+    if (modo_pecas == 1) {
+        printf("\n %ix%i", row, column);
+        for(i1=1; i1<9; i1++) {
+            printf(" - %i", tipo[i1]);
+        }
+        printf("\n\n");
+    }
+
+
+    // modo de jogo j0
     if(jogo == 0) {
-        for (i = 0; i < row; i++) {
+        for (i1 = 0; i1 < row; i1++) {
             if(num<10)
                 printf("  %i", num);
             else
                 printf(" %i", num);
 
             for (i2 = 0; i2 < column; i2++) {
-                printf(" %c", table[i][i2]);
+                printf(" %c", table[i1][i2]);
             }
             num--;
             printf("\n");
         }
     }
+    // modo de jogo j1
     if(jogo == 1) {
-        modo_j1();
-        for (i = 0; i < row; i++) {
+        for (i1 = 0; i1 < row; i1++) {
             if(num<10)
                 printf("  %i", num);
             else
                 printf(" %i", num);
 
             for (i2 = 0; i2 < column; i2++) {
-                printf(" %c", table_p[i][i2]);
+                printf(" %c", table_p[i1][i2]);
             }
             num--;
             printf("\n");
         }
     }
 
-    //bottom row of letters
+    // letras no final do tabuleiro
     printf("   ");
-    for(i=0; i<column; i++) {
-        printf(" %c", letters[i]);
+    for(i1=0; i1<column; i1++) {
+        printf(" %c", letters[i1]);
     }
     printf("\n");
 }
@@ -179,7 +202,7 @@ void printBoard() {
  *  Paremetros de saida: n/a
  */
 
-int restricao_1(for1, for2, modo_pecas) {
+int restricao_1(for1, for2, modo_pecas, a, contador1) {
 
     int i1, flag = 0;
     char check1, check2, check3, check4;
@@ -295,6 +318,11 @@ int restricao_1(for1, for2, modo_pecas) {
         }
     }
 
+    // caso a peça nao seja colocável, no modo de posicionamento 1, volta a subtrair o valor da peça no array
+    if (flag == 1 && modo_pecas == 1)
+        tipo[contador1]--;
+
+    // caso a peça nao seja colocável, no modo de posicionamento 2, volta a adicionar o valor da peça no array
     if (flag == 1 && modo_pecas == 2)
         tipo[peca]++;
 
@@ -314,6 +342,7 @@ void escolha_pecas() {
     int i1, controlo=0, soma=0;
 
     do {
+        controlo = 0;
         printf("\n - Insira o número de peças desejado por ordem de tamanho (1,2,3,4,5,6,7,8):\n\n");
         for(i1=1; i1<9; i1++) {
             printf("\tPeça %i - ", i1);
@@ -327,7 +356,6 @@ void escolha_pecas() {
             // Restrição 4
             if(soma > (row*column/18)) {
                 printf("\n\tInválido, tente novamente (Reduza o número de peças).");
-                scanf("%*s");
                 soma = 0;
                 controlo = 1;
                 break;
@@ -338,7 +366,6 @@ void escolha_pecas() {
         for(i1=1; i1<8; i1++) {
             if(tipo[i1] < tipo[i1+1]) {
                 printf("\n\tInválido, tente novamente (Ordem introduzida de peças incorreta).");
-                scanf("%*s");
                 soma = 0;
                 controlo = 1;
             }
@@ -353,76 +380,116 @@ void escolha_pecas() {
 }
 
 /**
- *  Nome: restricao_3
- *  Objetivo: implementar a restrição 3 relativamente á disposição das peças
+ *  Nome: rand_pecas
+ *  Objetivo: randomização da variante de uma peça, utilizada no modo de posicionamento 2
  *
  *  Parametros de entrada: a, modo_pecas
  *  Paremetros de saida: n/a
  */
 
-int restricao_3(int modo_pecas) {
+int rand_pecas(a, modo_pecas) {
 
-    if (peca == 0) {
-        a = 42;
-        tipo[peca]--;
-    }
-    else if (peca == 1) {
-        a = rand() % 9;
-        tipo[peca]--;
-    }
-    else if (peca == 2) {
-        a = rand() % 12 + 9;
-        tipo[peca]--;
-    }
-    else if (peca == 3) {
-        a = rand() % 6 + 21;
-        tipo[peca]--;
-    }
-    else if (peca == 4) {
-        a = rand() % 4 + 27;
-        tipo[peca]--;
-    }
-    else if (peca == 5) {
-        a = rand() % 4 + 31;
-        tipo[peca]--;
-    }
-    else if (peca == 6) {
-        a = rand() % 4 + 35;
-        tipo[peca]--;
-    }
-    else if (peca == 7) {
-        a = rand() % 2 + 39;
-        tipo[peca]--;
-    }
-    else if (peca == 8) {
-        a = 41;
-        tipo[peca]--;
-    }
+    switch(peca) {
+        case 0:
+            a = 42;
+            break;
+        case 1:
+            a = rand() % 9;
+            break;
+        case 2:
+            a = rand() % 12 + 9;
+            break;
+        case 3:
+            a = rand() % 6 + 21;
+            break;
+        case 4:
+            a = rand() % 4 + 27;
+            break;
+        case 5:
+            a = rand() % 4 + 31;
+            break;
+        case 6:
+            a = rand() % 4 + 35;
+            break;
+        case 7:
+            a = rand() % 2 + 39;
+            break;
+        case 8:
+            a = 41;
+            break; }
+
+    // ao subtrarir do array, conta como se a peça fosse colocada
+    tipo[peca]--;
 
     return a;
 }
 
+/**
+ *  Nome: contador
+ *  Objetivo: contar o tipo de peças geradas no modo p1
+ *
+ *  Parametros de entrada: a
+ *  Paremetros de saida: n/a
+ */
+
+int contador(a) {
+
+    if(a <= 8) {
+        tipo[1]++;
+        return 1;
+    }
+    else if (a > 8 && a <= 20) {
+        tipo[2]++;
+        return 2;
+    }
+    else if (a > 20 && a <= 26) {
+        tipo[3]++;
+        return 3;
+    }
+    else if (a > 26 && a <= 30 ) {
+        tipo[4]++;
+        return 4;
+    }
+    else if (a > 30 && a <= 34) {
+        tipo[5]++;
+        return 5;
+    }
+    else if (a > 34 && a <= 38) {
+        tipo[6]++;
+        return 6;
+    }
+    else if (a > 38 && a <= 40) {
+        tipo[7]++;
+        return 7;
+    }
+    else if (a == 41) {
+        tipo[8]++;
+        return 8;
+    }
+    return 0;
+}
 
 /**
- *  Nome: modo
+ *  Nome: modo_pos
  *  Objetivo: correr o programa de acordo com o modo selecionado
  *
  *  Parametros de entrada: n/a
  *  Paremetros de saida: n/a
  */
 
-void modo() {
+int modo_pos() {
 
     /* for1 - percorre matriz global de 3 em 3 linhas.
        for2 - percorre matriz global de 3 em 3 colunas.
        for3 - percorre natriz específica 3x3 por linhas.
        for4 - percorre matriz específica 3x3 por colunas. */
     int for1, for2, for3, for4;
+    int a, contador1;
     time_t t;
     srand((unsigned) time(&t));
 
     // Retira o modo de posicionamento de peças
-    int modo_pecas = pos();
+    int modo_pecas = pos_select();
 
     // Modo p2
     if(modo_pecas == 2)
@@ -436,8 +503,10 @@ void modo() {
             do {
 
                 // Modo p1
-                if (modo_pecas == 1)
+                if (modo_pecas == 1) {
                     a = rand() % 43;
+                    contador1 = contador(a);
+                }
 
                 // Modo p2
                 if(modo_pecas == 2) {
@@ -445,7 +514,7 @@ void modo() {
                         peca = rand()%9;
                     }while(tipo[peca] == 0);
 
-                    a = restricao_3(modo_pecas);
+                    a = rand_pecas(a, modo_pecas);
                 }
 
                 for(for3=0; for3<3; for3++) {
@@ -456,10 +525,57 @@ void modo() {
                     }
                 }
 
-                //restricao_1(for1, for2, modo_pecas);
-            }while(restricao_1(for1,for2, modo_pecas));
+            }while(restricao_1(for1,for2, modo_pecas, a, contador1));
         }
     }
+
+    return modo_pecas;
+}
+
+/**
+ *  Nome: modo_jogo
+ *  Objetivo: escolher modos de jogo???
+ *
+ *  Parametros de entrada:
+ *  Paremetros de saida:
+ */
+
+void modo_jogo() {
+
+}
+
+/**
+ *  Nome: modo_j1
+ *  Objetivo: implementar o modo de jogo 1
+ *
+ *  Parametros de entrada: n/a
+ *  Paremetros de saida: n/a
+ */
+
+void modo_j1() {
+
+    int i1, i2, disparo_linha;
+    char disparo_coluna;
+    time_t begin = time(NULL);
+    //Inicializar o tabuleiro de jogo a ' '
+    for(i1 = 0; i1 < row; i1++) {
+        for (i2 = 0; i2 < column; i2++) {
+            table_p[i1][i2] = ' ';
+        }
+    }
+
+    //do {
+        printf("\n\t - Insira as coordenadas de disparo (coluna-linha): ");
+        scanf(" %c %i", &disparo_coluna, &disparo_linha);
+        printf("\n");
+
+        table_p[row - disparo_linha - 2][disparo_coluna - 17] = table[row - disparo_linha - 2][disparo_coluna - 17];
+        printBoard();
+    //}while( );
+
+
+    time_t end = time(NULL);
+    int time = end - begin;
 }
 
 /**
@@ -470,35 +586,10 @@ void modo() {
  *  Paremetros de saida: n/a
  */
 
-void modo_j1() {
-
-    int i1, i2, disparo_linha;
-    char disparo_coluna;
-    //Inicializar o tabuleiro de jogo a '-'
-    for(i1 = 0; i1 < row; i1++) {
-        for (i2 = 0; i2 < column; i2++) {
-            table_p[i1][i2] = ' ';
-        }
-    }
-
-    //do {
-        printf("\n\t - Insira as coordenadas de disparo (coluna-linha): ");
-        scanf(" %c %i", &disparo_coluna, &disparo_linha);
-
-        table_p[row - disparo_linha - 2][disparo_coluna - 17] = table[row - disparo_linha - 2][disparo_coluna - 17];
-        //printBoard();
-
-    //}while( );
-
-
-
-}
-
 int main() {
     tamanho_jogo();
-    modo();
-    printBoard();
-    //modo_j1();
+    int modo_pecas = modo_pos();
+    modo_jogo();
+    printBoard(modo_pecas);
     return EXIT_SUCCESS;
 }
-
