@@ -133,7 +133,7 @@ int pos_select() {
  *  Parametros de saida: n/a
  */
 
-void printBoard(modo_pecas) {
+void printBoard(modo_pecas, jogo, time) {
 
     system("clear");
     int i1, i2;
@@ -141,9 +141,6 @@ void printBoard(modo_pecas) {
 
     //display da matriz na consola + column of numbers
     int num = row;
-
-    // busca modo de jogo
-    int jogo = jogo_select();
 
     // Tipos de peça no modo p1
     if (modo_pecas == 1) {
@@ -153,7 +150,6 @@ void printBoard(modo_pecas) {
         }
         printf("\n\n");
     }
-
 
     // modo de jogo j0
     if(jogo == 0) {
@@ -191,7 +187,8 @@ void printBoard(modo_pecas) {
     for(i1=0; i1<column; i1++) {
         printf(" %c", letters[i1]);
     }
-    printf("\n");
+    if(jogo == 1)
+        printf("\n\n O jogo demorou %i segundos.", time);
 }
 
 /**
@@ -202,7 +199,7 @@ void printBoard(modo_pecas) {
  *  Paremetros de saida: n/a
  */
 
-int restricao_1(for1, for2, modo_pecas, a, contador1) {
+int restricao_1(for1, for2, modo_pecas, contador1) {
 
     int i1, flag = 0;
     char check1, check2, check3, check4;
@@ -525,26 +522,14 @@ int modo_pos() {
                     }
                 }
 
-            }while(restricao_1(for1,for2, modo_pecas, a, contador1));
+            }while(restricao_1(for1,for2, modo_pecas, contador1));
         }
     }
 
     return modo_pecas;
 }
 
-/**
- *  Nome: modo_jogo
- *  Objetivo: escolher modos de jogo???
- *
- *  Parametros de entrada:
- *  Paremetros de saida:
- */
-
-void modo_jogo() {
-
-}
-
-/**
+ /**
  *  Nome: modo_j1
  *  Objetivo: implementar o modo de jogo 1
  *
@@ -552,7 +537,7 @@ void modo_jogo() {
  *  Paremetros de saida: n/a
  */
 
-void modo_j1() {
+int modo_j1() {
 
     int i1, i2, disparo_linha;
     char disparo_coluna;
@@ -570,12 +555,30 @@ void modo_j1() {
         printf("\n");
 
         table_p[row - disparo_linha - 2][disparo_coluna - 17] = table[row - disparo_linha - 2][disparo_coluna - 17];
-        printBoard();
     //}while( );
 
 
     time_t end = time(NULL);
     int time = end - begin;
+    return time;
+}
+
+/**
+ *  Nome: modo_jogo
+ *  Objetivo: escolher modos de jogo???
+ *
+ *  Parametros de entrada:
+ *  Paremetros de saida:
+ */
+
+int modo_jogo(jogo) {
+    int time;
+
+    if(jogo == 1) {
+        time = modo_j1();
+    }
+
+    return time;
 }
 
 /**
@@ -589,7 +592,8 @@ void modo_j1() {
 int main() {
     tamanho_jogo();
     int modo_pecas = modo_pos();
-    modo_jogo();
-    printBoard(modo_pecas);
+    int jogo = jogo_select();
+    int time = modo_jogo(jogo);
+    printBoard(modo_pecas, jogo, time);
     return EXIT_SUCCESS;
 }
