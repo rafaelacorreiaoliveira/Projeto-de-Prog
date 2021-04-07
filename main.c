@@ -4,11 +4,8 @@
 
 int row=9, column=9;
 int tipo [9] = {0,0,0,0,0,0,0,0,0};
-// DECLAREI PEÇA COMO GLOBAL PQ NAO SABIA COMO CONTORNAR O PROBLEMA DA RESTRIÇÃO 3, MUDAR SE POSSÍVEL
-int peca;
-char table[15][24];
-char table_p[15][24];
-
+int peca, conta_pecas;
+char table[1][15][24] = {{{' '}}};
 char pecas[43][3][3] = {
     {{'1','-','-'}, {'-','-','-'}, {'-','-','-'}},
     {{'-','1','-'}, {'-','-','-'}, {'-','-','-'}},
@@ -65,7 +62,6 @@ char pecas[43][3][3] = {
  */
 
 int jogo_select() {
-
     int jogo;
 
     do {
@@ -133,7 +129,7 @@ int pos_select() {
  *  Parametros de saida: n/a
  */
 
-void printBoard(modo_pecas, jogo, time) {
+void printBoard(modo_pecas, jogo) {
 
     system("clear");
     int i1, i2;
@@ -143,7 +139,7 @@ void printBoard(modo_pecas, jogo, time) {
     int num = row;
 
     // Tipos de peça no modo p1
-    if (modo_pecas == 1) {
+    if (modo_pecas == 1 && jogo == 0) {
         printf("\n %ix%i", row, column);
         for(i1=1; i1<9; i1++) {
             printf(" - %i", tipo[i1]);
@@ -151,35 +147,18 @@ void printBoard(modo_pecas, jogo, time) {
         printf("\n\n");
     }
 
-    // modo de jogo j0
-    if(jogo == 0) {
-        for (i1 = 0; i1 < row; i1++) {
-            if(num<10)
-                printf("  %i", num);
-            else
-                printf(" %i", num);
+    // modo de jogo j0 ou j1 (dependendo da variável jogo)
+    for (i1 = 0; i1 < row; i1++) {
+        if(num<10)
+            printf("  %i", num);
+        else
+            printf(" %i", num);
 
-            for (i2 = 0; i2 < column; i2++) {
-                printf(" %c", table[i1][i2]);
-            }
-            num--;
-            printf("\n");
+        for (i2 = 0; i2 < column; i2++) {
+            printf(" %c", table[jogo][i1][i2]);
         }
-    }
-    // modo de jogo j1
-    if(jogo == 1) {
-        for (i1 = 0; i1 < row; i1++) {
-            if(num<10)
-                printf("  %i", num);
-            else
-                printf(" %i", num);
-
-            for (i2 = 0; i2 < column; i2++) {
-                printf(" %c", table_p[i1][i2]);
-            }
-            num--;
-            printf("\n");
-        }
+        num--;
+        printf("\n");
     }
 
     // letras no final do tabuleiro
@@ -187,8 +166,8 @@ void printBoard(modo_pecas, jogo, time) {
     for(i1=0; i1<column; i1++) {
         printf(" %c", letters[i1]);
     }
-    if(jogo == 1)
-        printf("\n\n O jogo demorou %i segundos.", time);
+    //if(jogo == 1)
+    //    printf("\n\n O jogo demorou %i segundos.", tempo);
 }
 
 /**
@@ -212,17 +191,17 @@ int restricao_1(for1, for2, modo_pecas, contador1) {
         for(i1=0; i1<3; i1++) {
             /* check1 - 1º coluna da matriz 3x3
                check2 - 3º coluna da matriz 3x3 anterior */
-            check1 = table[i1][3*for2];
-            check2 = table[i1][3*for2 - 1];
+            check1 = table[0][i1][3*for2];
+            check2 = table[0][i1][3*for2 - 1];
 
                 // check3 - 3º coluna da matriz 3x3 anterior, linha superior
                 if((i1-1) >= 0) {
-                    check3 = table[i1 - 1][3*for2 - 1]; }
+                    check3 = table[0][i1 - 1][3*for2 - 1]; }
                 else {
                     check3 = '-'; }
 
             // check4 - 3º coluna da matriz 3x3 anterior, linha inferior
-            check4 = table[i1 + 1][3*for2 - 1];
+            check4 = table[0][i1 + 1][3*for2 - 1];
 
             // condições de peça inválida
             if(check1 != '-' && check2 != '-')
@@ -239,17 +218,17 @@ int restricao_1(for1, for2, modo_pecas, contador1) {
         for(i1=0; i1<3; i1++) {
             /* check1 - 1º linha da matriz 3x3
                check2 - 3º linha da matriz 3x3 anterior */
-            check1 = table[for1*3][i1];
-            check2 = table[for1*3 - 1][i1];
+            check1 = table[0][for1*3][i1];
+            check2 = table[0][for1*3 - 1][i1];
 
             // check3 - linha superior, um bloco á esquerda
             if((i1-1) >= 0) {
-                check3 = table[for1*3 - 1][i1-1]; }
+                check3 = table[0][for1*3 - 1][i1-1]; }
             else {
                 check3 = '-'; }
 
             // check4 - linha superior, uma bloco á direita
-            check4 = table[for1*3 - 1][i1+1];
+            check4 = table[0][for1*3 - 1][i1+1];
 
             // condições de peça inválida
             if(check1 != '-' && check2 != '-')
@@ -267,15 +246,15 @@ int restricao_1(for1, for2, modo_pecas, contador1) {
             /*  Verificação das 4 casas da coluna anterior
                 check1 - 1º coluna da matriz 3x3
                 check2 - 3º coluna da matriz 3x3 anterior */
-            check1 = table[i1 + for1*3][for2*3];
-            check2 = table[i1 + for1*3][for2*3 - 1];
+            check1 = table[0][i1 + for1*3][for2*3];
+            check2 = table[0][i1 + for1*3][for2*3 - 1];
 
             // check3 - 3º coluna da matriz 3x3 anterior, linha superior
-            check3 = table[i1 + for1*3 - 1][for2*3 - 1];
+            check3 = table[0][i1 + for1*3 - 1][for2*3 - 1];
 
             // check4 - 3º coluna da matriz 3x3 anterior, linha inferior
             if((for1*3 + i1) != (row - 1)) {
-                check4 = table[i1 + for1*3 + 1][for2*3 - 1]; }
+                check4 = table[0][i1 + for1*3 + 1][for2*3 - 1]; }
             else {
                 check4 = '-'; }
 
@@ -292,17 +271,17 @@ int restricao_1(for1, for2, modo_pecas, contador1) {
                 /*  Verificação das 5 casas da linha superior
                     check1 - 1º linha da matriz 3x3
                     check2 - 3º linha da matriz 3x3 anterior */
-                check1 = table[for1*3][i1 + for2*3];
-                check2 = table[for1*3 - 1][i1 + for2*3];
+                check1 = table[0][for1*3][i1 + for2*3];
+                check2 = table[0][for1*3 - 1][i1 + for2*3];
 
                 //check3 - linha superior, um bloco á direita
                 if((for2*3 + i1) != (column - 1)) {
-                    check3 = table[for1*3 - 1][for2*3 + i1 + 1]; }
+                    check3 = table[0][for1*3 - 1][for2*3 + i1 + 1]; }
                 else {
                     check3 = '-'; }
 
                 //check4 - linha superior, um bloca á esquerda
-                check4 = table[for1*3 - 1][for2*3 + i1 - 1];
+                check4 = table[0][for1*3 - 1][for2*3 + i1 - 1];
 
                 // condições de peça inválida
                 if(check1 != '-' && check2 != '-')
@@ -498,35 +477,44 @@ int modo_pos() {
 
             //Matriz 3x3 específica
             do {
-
                 // Modo p1
                 if (modo_pecas == 1) {
                     a = rand() % 43;
                     contador1 = contador(a);
                 }
-
                 // Modo p2
                 if(modo_pecas == 2) {
                     do {
                         peca = rand()%9;
                     }while(tipo[peca] == 0);
-
                     a = rand_pecas(a, modo_pecas);
                 }
-
                 for(for3=0; for3<3; for3++) {
                     for(for4=0; for4<3; for4++) {
-
-                        table[for3+for1*3][for4+for2*3] = pecas[a][for3][for4];
-
+                        table[0][for3+for1*3][for4+for2*3] = pecas[a][for3][for4];
                     }
                 }
-
-            }while(restricao_1(for1,for2, modo_pecas, contador1));
+            }while(restricao_1(for1, for2, modo_pecas, contador1));
         }
     }
-
     return modo_pecas;
+}
+
+/**
+ *  Nome: disparo_j1
+ *  Objetivo: verificar condição de vitória
+ *
+ *  Parametros de entrada: disparo_linha, disparo_coluna
+ *  Paremetros de saida: vitoria
+ */
+
+int disparo_j1(disparo_linha, disparo_coluna) {
+    if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-') {
+        conta_pecas --;
+        if (conta_pecas == 0)
+            return 1;
+    }
+    return 0;
 }
 
  /**
@@ -538,47 +526,53 @@ int modo_pos() {
  */
 
 int modo_j1() {
-
-    int i1, i2, disparo_linha;
+    int disparo_linha;
+    int vitoria;
     char disparo_coluna;
-    time_t begin = time(NULL);
-    //Inicializar o tabuleiro de jogo a ' '
-    for(i1 = 0; i1 < row; i1++) {
-        for (i2 = 0; i2 < column; i2++) {
-            table_p[i1][i2] = ' ';
-        }
-    }
 
-    //do {
-        printf("\n\t - Insira as coordenadas de disparo (coluna-linha): ");
-        scanf(" %c %i", &disparo_coluna, &disparo_linha);
-        printf("\n");
+    printf("\n\n\t- Insira as coordenadas de disparo (coluna-linha): ");
+    scanf(" %c %i", &disparo_coluna, &disparo_linha);
+    printf("\n");
 
-        table_p[row - disparo_linha - 2][disparo_coluna - 17] = table[row - disparo_linha - 2][disparo_coluna - 17];
-    //}while( );
+    //se o utilizador inserir uma coordenada já jogada, conta_pecas não é afetado com a próxima função
+    if(table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ')
+        conta_pecas++;
 
+    table[1][row - disparo_linha - 2][disparo_coluna - 17] = table[0][row - disparo_linha - 2][disparo_coluna - 17];
 
-    time_t end = time(NULL);
-    int time = end - begin;
-    return time;
+    //condição de vitória
+    vitoria = disparo_j1(disparo_linha, disparo_coluna);
+    return vitoria;
 }
 
 /**
  *  Nome: modo_jogo
  *  Objetivo: escolher modos de jogo???
  *
- *  Parametros de entrada:
+ *  Parametros de entrada: jogo
  *  Paremetros de saida:
  */
 
-int modo_jogo(jogo) {
-    int time;
-
+int modo_jogo(modo_pecas, jogo) {
     if(jogo == 1) {
-        time = modo_j1();
+        int i1, i2, vitoria;
+        //Inicializar o tabuleiro de jogo j1 a ' '
+        for(i1 = 0; i1 < row; i1++) {
+            for (i2 = 0; i2 < column; i2++) {
+                table[1][i1][i2] = ' ';
+            }
+        }
+        // calcula número de células ocupadas por números na matriz
+        for(i1=1; i1<=9; i1++) {
+            conta_pecas += tipo[i1];
+        }
+        do {
+            vitoria = modo_j1();
+            if (vitoria == 0)
+                printBoard(modo_pecas, jogo);
+        }while(vitoria == 0);
     }
-
-    return time;
+    return 0;
 }
 
 /**
@@ -593,7 +587,7 @@ int main() {
     tamanho_jogo();
     int modo_pecas = modo_pos();
     int jogo = jogo_select();
-    int time = modo_jogo(jogo);
-    printBoard(modo_pecas, jogo, time);
+    modo_jogo(modo_pecas, jogo);
+    printBoard(modo_pecas, jogo);
     return EXIT_SUCCESS;
 }
