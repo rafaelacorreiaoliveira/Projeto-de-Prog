@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 int row=9, column=9;
 int tipo [9] = {0,0,0,0,0,0,0,0,0};
@@ -74,51 +75,6 @@ int jogo_select() {
     } while(jogo != 0 && jogo != 1 && jogo != 2);
 
     return jogo;
-}
-
-/**
- *  Nome: tamanho_jogo
- *  Objetivo: obter a partir do utilizador o tamanho do tabuleiro a ser utilizado
- *
- *  Parametros de entrada: n/a
- *  Parametros de saida: n/a
- */
-
-void tamanho_jogo() {
-    do {
-        printf("\n\n\t|Insira o tamanho do campo de jogo desejado|\n\n --> Input deverá ser múltiplo de 3. Linhas (9-15) x Colunas (9-24): ");
-        if(scanf("%i %i", &row, &column) != 2) {
-            printf("\n\tInválido, tente novamente.");
-            scanf("%*c");
-        }
-        system("clear");
-    } while((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0));
-}
-
-
-/**
- *  Nome: pos_select
- *  Objetivo: obter a partir do utilizador o tipo de posicionamento de peças
- *
- *  Parametros de entrada: n/a
- *  Parametros de saida: modo_pecas
- */
-
-int pos_select() {
-
-    int modo_pecas=0;
-
-    do {
-        printf("\n\n\t|Modos de posicionamento de peças|\n\n\t1. Aleatório.\n\t2. Escolha \n\n\tEscolha: ");
-        if(scanf("%i", &modo_pecas) != 1) {
-            printf("\n\tInválido, tente novamente.");
-            scanf("%*s");
-        }
-        system("clear");
-
-    } while(modo_pecas < 1 || modo_pecas > 2);
-
-    return modo_pecas;
 }
 
 /**
@@ -316,43 +272,25 @@ int restricao_1(for1, for2, modo_pecas, contador1) {
 void escolha_pecas() {
 
     int i1, controlo=0, soma=0;
-
-    do {
-        controlo = 0;
-        printf("\n - Insira o número de peças desejado por ordem de tamanho (1,2,3,4,5,6,7,8):\n\n");
         for(i1=1; i1<9; i1++) {
-            printf("\tPeça %i - ", i1);
-            if(scanf("%i", &tipo[i1]) != 1){
-                printf("\n\tInválido, tente novamente (Entrada não reconhecida).");
-                scanf("%*s");
-                soma = 0;
-                controlo = 1;
-                break;
-            }
             // Restrição 4
             if(soma > (row*column/18)) {
-                printf("\n\tInválido, tente novamente (Reduza o número de peças).");
                 soma = 0;
-                controlo = 1;
-                break;
+             printf("Número de peças inválido.");
+                exit(-1);
             }
             soma += tipo[i1];
         }
-        // Verifica se alguma peça de tipo superior têm mais repetições que a anterior
+        //Verifica se alguma peça de tipo superior têm mais repetições que a anterior
         for(i1=1; i1<8; i1++) {
             if(tipo[i1] < tipo[i1+1]) {
-                printf("\n\tInválido, tente novamente (Ordem introduzida de peças incorreta).");
                 soma = 0;
-                controlo = 1;
+            printf("Número de peças inválido.");
+            exit(-1);
             }
 
         }
         system("clear");
-
-        // Espaços a preencher com matrizes vazias
-        tipo[0] = (row*column)/9-tipo[1]-tipo[2]-tipo[3]-tipo[4]-tipo[5]-tipo[6]-tipo[7]-tipo[8];
-
-    } while(controlo == 1);
 }
 
 /**
@@ -363,10 +301,6 @@ void escolha_pecas() {
  *  Paremetros de saida: n/a
  */
 
- void modo_d1() {
-
-
- }
 
 int rand_pecas(a, modo_pecas) {
 
@@ -458,7 +392,7 @@ int contador(a) {
  *  Paremetros de saida: n/a
  */
 
-int modo_pos() {
+int modo_pos(int modo_pecas) {
 
     /* for1 - percorre matriz global de 3 em 3 linhas.
        for2 - percorre matriz global de 3 em 3 colunas.
@@ -468,9 +402,6 @@ int modo_pos() {
     int a, contador1;
     time_t t;
     srand((unsigned) time(&t));
-
-    // Retira o modo de posicionamento de peças
-    int modo_pecas = pos_select();
 
     // Modo p2
     if(modo_pecas == 2)
@@ -546,7 +477,6 @@ int modo_j1() {
         }
     }
 
-
     table[1][row - disparo_linha - 2][disparo_coluna - 17] = table[0][row - disparo_linha - 2][disparo_coluna - 17];
 
     //condição de vitória
@@ -585,8 +515,14 @@ int modo_jogo(modo_pecas, jogo) {
     }
     return 0;
 }
-
-void utilizar(char *program){
+/**
+ *  Nome: menu_ajuda
+ *  Objetivo: ajuda ao utilizador
+ *
+ *  Parametros de entrada:
+ *  Paremetros de saida:
+ */
+void menu_ajuda(char *program){
 
     printf("Jogo da Batalha Naval.\n\n");
     printf("Opções de funcionamento: \n");
@@ -604,6 +540,7 @@ void utilizar(char *program){
     printf("-6\t número de peças do tipo 6");
     printf("-7\t número de peças do tipo 7");
     printf("-8\t número de peças do tipo 8");
+    //COLOCAR EXEMPLOS
 }
 
 /**
@@ -615,54 +552,63 @@ void utilizar(char *program){
  */
 
 
-/*int main() {
-    tamanho_jogo();
-    int modo_pecas = modo_pos();
-    int jogo = jogo_select();
-    modo_jogo(modo_pecas, jogo);
-    printBoard(modo_pecas, jogo);
-    return EXIT_SUCCESS;
-} */
 int main(int argc, char *argv[])
 {
-    int opt = 'h'; /* opção para getopt() */
-    int opterr = 0;
-    int optarg;
-    while((opt=getopt(argc, argv, "tjpd12345678:")) != -1){
+    //tamanho_jogo();
+    int modo_pecas,jogo,disparos;
+    int opt = 'h';
+    opterr = 0;
+    while((opt=getopt(argc, argv, "t:j:p:d:1:2:3:4:5:6:7:8:h")) != -1){
 
         switch (opt) {
             case 't': /* dimensão do tabuleiro */
-                sscanf(optarg, " %d %d", &row, &column); /* se houver erro, fica o valor por omissão */
+                sscanf(optarg, " %dx%d", &row, &column);
                 break;
-            case 'j': /* mínimo */
+            case 'j':
                 sscanf(optarg, "%d", &jogo);
                 break;
             case 'p':
                 sscanf(optarg, "%d", &modo_pecas);
                 break;
             case 'd':
+                sscanf(optarg, "%d", &disparos);
                 break;
             case '1':
+                sscanf(optarg, "%d", &tipo[1]);
                 break;
             case '2':
+                sscanf(optarg, "%d", &tipo[2]);
                 break;
             case '3':
+                sscanf(optarg, "%d", &tipo[3]);
                 break;
             case '4':
+                sscanf(optarg, "%d", &tipo[4]);
                 break;
             case '5':
+                sscanf(optarg, "%d", &tipo[5]);
                 break;
             case '6':
+                sscanf(optarg, "%d", &tipo[6]);
                 break;
             case '7':
+                sscanf(optarg, "%d", &tipo[7]);
                 break;
             case '8':
+                sscanf(optarg, "%d", &tipo[8]);
                 break;
             case 'h':
-                utilizacao(argv[0]);
+                menu_ajuda(argv[0]);
                 return EXIT_FAILURE;
                 break;
         }
     }
+    tipo[0] = (row*column)/9-tipo[1]-tipo[2]-tipo[3]-tipo[4]-tipo[5]-tipo[6]-tipo[7]-tipo[8];
+    modo_jogo(modo_pecas, jogo);
+    modo_pos(modo_pecas);
+    if((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0))
+        exit(-1);
+    printBoard(modo_pecas, jogo);
+
 }
 
