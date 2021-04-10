@@ -363,6 +363,11 @@ void escolha_pecas() {
  *  Paremetros de saida: n/a
  */
 
+ void modo_d1() {
+
+
+ }
+
 int rand_pecas(a, modo_pecas) {
 
     switch(peca) {
@@ -535,8 +540,12 @@ int modo_j1() {
     printf("\n");
 
     //se o utilizador inserir uma coordenada já jogada, conta_pecas não é afetado com a próxima função
-    if(table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ')
-        conta_pecas++;
+    if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ') {
+        if(table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-'){
+            conta_pecas++;
+        }
+    }
+
 
     table[1][row - disparo_linha - 2][disparo_coluna - 17] = table[0][row - disparo_linha - 2][disparo_coluna - 17];
 
@@ -564,15 +573,37 @@ int modo_jogo(modo_pecas, jogo) {
         }
         // calcula número de células ocupadas por números na matriz
         for(i1=1; i1<=9; i1++) {
-            conta_pecas += tipo[i1];
+            conta_pecas += tipo[i1]*i1;
         }
         do {
             vitoria = modo_j1();
             if (vitoria == 0)
+                printf("%i", conta_pecas);
                 printBoard(modo_pecas, jogo);
         }while(vitoria == 0);
+        system("clear");
     }
     return 0;
+}
+
+void utilizar(char *program){
+
+    printf("Jogo da Batalha Naval.\n\n");
+    printf("Opções de funcionamento: \n");
+    printf("-h\t ajuda ao utilizador, mostra as instruções.\n");
+    printf("-t\t dimensões do tabuleiro (linha x coluna).");
+    printf("-j\t modos de jogo.");
+    printf("-p\t modo de posicionamento de paças pelo computador (1 a 2)");
+    printf("-d\t modos de disparo de peças pelo computador ( a 3)");
+    printf("-1\t número de peças do tipo 1");
+    printf("-2\t número de peças do tipo 2");
+    printf("-3\t número de peças do tipo 3");
+    printf("-4\t número de peças do tipo 3");
+    printf("-4\t número de peças do tipo 4");
+    printf("-5\t número de peças do tipo 5");
+    printf("-6\t número de peças do tipo 6");
+    printf("-7\t número de peças do tipo 7");
+    printf("-8\t número de peças do tipo 8");
 }
 
 /**
@@ -583,11 +614,55 @@ int modo_jogo(modo_pecas, jogo) {
  *  Paremetros de saida: n/a
  */
 
-int main() {
+
+/*int main() {
     tamanho_jogo();
     int modo_pecas = modo_pos();
     int jogo = jogo_select();
     modo_jogo(modo_pecas, jogo);
     printBoard(modo_pecas, jogo);
     return EXIT_SUCCESS;
+} */
+int main(int argc, char *argv[])
+{
+    int opt = 'h'; /* opção para getopt() */
+    int opterr = 0;
+    int optarg;
+    while((opt=getopt(argc, argv, "tjpd12345678:")) != -1){
+
+        switch (opt) {
+            case 't': /* dimensão do tabuleiro */
+                sscanf(optarg, " %d %d", &row, &column); /* se houver erro, fica o valor por omissão */
+                break;
+            case 'j': /* mínimo */
+                sscanf(optarg, "%d", &jogo);
+                break;
+            case 'p':
+                sscanf(optarg, "%d", &modo_pecas);
+                break;
+            case 'd':
+                break;
+            case '1':
+                break;
+            case '2':
+                break;
+            case '3':
+                break;
+            case '4':
+                break;
+            case '5':
+                break;
+            case '6':
+                break;
+            case '7':
+                break;
+            case '8':
+                break;
+            case 'h':
+                utilizacao(argv[0]);
+                return EXIT_FAILURE;
+                break;
+        }
+    }
 }
+
