@@ -53,30 +53,6 @@ char pecas[43][3][3] = {
     {{'-','-','-'}, {'-','-','-'}, {'-','-','-'}},
 };
 
-
-/**
- *  Nome: jogo_select
- *  Objetivo: obter a partir do utilizador o modo de jogo que o programa irá executar
- *
- *  Parametros de entrada: n/a
- *  Parametros de saida: jogo
- */
-
-int jogo_select() {
-    int jogo;
-
-    do {
-        printf("\n\n\t|Insira o modo de jogo desejado|\n\n\t0.Aleatório\n\t1.Disparo\n\t2.Computador \n\n\t--> ");
-        if(scanf("%i", &jogo) != 1) {
-            printf("\n\tInválido, tente novamente.");
-            scanf("%*c");
-        }
-        system("clear");
-    } while(jogo != 0 && jogo != 1 && jogo != 2);
-
-    return jogo;
-}
-
 /**
  *  Nome: printBoard
  *  Objetivo: representar no ecrã valores previamente carregados no tabuleiro dedicado ao correto modo de jogo
@@ -508,7 +484,7 @@ int modo_jogo(modo_pecas, jogo) {
         do {
             vitoria = modo_j1();
             if (vitoria == 0)
-                printf("%i", conta_pecas);
+                printf("%i\n", conta_pecas);
                 printBoard(modo_pecas, jogo);
         }while(vitoria == 0);
         system("clear");
@@ -604,10 +580,10 @@ int main(int argc, char *argv[])
         }
     }
     tipo[0] = (row*column)/9-tipo[1]-tipo[2]-tipo[3]-tipo[4]-tipo[5]-tipo[6]-tipo[7]-tipo[8];
-    modo_jogo(modo_pecas, jogo);
     modo_pos(modo_pecas);
     if((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0))
         exit(-1);
+    modo_jogo(modo_pecas, jogo);
     printBoard(modo_pecas, jogo);
 
 }
