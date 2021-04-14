@@ -1,4 +1,4 @@
-#include <stdio.h>
+##include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
@@ -61,10 +61,8 @@ char pecas[43][3][3] = {
  *  Parametros de saida: n/a
  */
 
-void printBoard(modo_pecas, jogo) {
-
-    system("clear");
-    int i1, i2;
+void printBoard(modo_pecas, jogo, tempo_jogo) {
+    int i1, i2, modo=0;
     char letters[] = "ABCDEFGHIJKLMNOQPRSTUVWX";
 
     //display da matriz na consola + column of numbers
@@ -79,7 +77,9 @@ void printBoard(modo_pecas, jogo) {
         printf("\n\n");
     }
 
-    // modo de jogo j0 ou j1 (dependendo da variável jogo)
+    // modo de jogo j0 ou j1/j2 (dependendo da variável modo)
+    if(jogo == 1 || jogo == 2)
+        modo=1;
     for (i1 = 0; i1 < row; i1++) {
         if(num<10)
             printf("  %i", num);
@@ -87,7 +87,7 @@ void printBoard(modo_pecas, jogo) {
             printf(" %i", num);
 
         for (i2 = 0; i2 < column; i2++) {
-            printf(" %c", table[jogo][i1][i2]);
+            printf(" %c", table[modo][i1][i2]);
         }
         num--;
         printf("\n");
@@ -98,7 +98,7 @@ void printBoard(modo_pecas, jogo) {
     for(i1=0; i1<column; i1++) {
         printf(" %c", letters[i1]);
     }
-    //if(jogo == 1)
+    //if(jogo == 1 || jogo == 2)
     //    printf("\n\n O jogo demorou %i segundos.", tempo);
 }
 
@@ -247,26 +247,26 @@ int restricao_1(for1, for2, modo_pecas, contador1) {
 
 void escolha_pecas() {
 
-    int i1, controlo=0, soma=0;
-        for(i1=1; i1<9; i1++) {
-            // Restrição 4
-            if(soma > (row*column/18)) {
-                soma = 0;
-             printf("Número de peças inválido.");
-                exit(-1);
-            }
-            soma += tipo[i1];
-        }
-        //Verifica se alguma peça de tipo superior têm mais repetições que a anterior
-        for(i1=1; i1<8; i1++) {
-            if(tipo[i1] < tipo[i1+1]) {
-                soma = 0;
-            printf("Número de peças inválido.");
+    int i1, soma=0;
+    for(i1=1; i1<9; i1++) {
+        // Restrição 4
+        if(soma > (row*column/18)) {
+            soma = 0;
+         printf("Número de peças inválido.\n");
             exit(-1);
-            }
-
         }
-        system("clear");
+        soma += tipo[i1];
+    }
+    //Verifica se alguma peça de tipo superior têm mais repetições que a anterior
+    for(i1=1; i1<8; i1++) {
+        if(tipo[i1] < tipo[i1+1]) {
+            soma = 0;
+        printf("Número de peças inválido.\n");
+        exit(-1);
+        }
+
+    }
+    system("clear");
 }
 
 /**
@@ -324,7 +324,6 @@ int rand_pecas(a, modo_pecas) {
  */
 
 int contador(a) {
-
     if(a <= 8) {
         tipo[1]++;
         return 1;
@@ -368,7 +367,7 @@ int contador(a) {
  *  Paremetros de saida: n/a
  */
 
-int modo_pos(int modo_pecas) {
+void modo_pos(int modo_pecas) {
 
     /* for1 - percorre matriz global de 3 em 3 linhas.
        for2 - percorre matriz global de 3 em 3 colunas.
@@ -409,7 +408,23 @@ int modo_pos(int modo_pecas) {
             }while(restricao_1(for1, for2, modo_pecas, contador1));
         }
     }
-    return modo_pecas;
+}
+
+/**
+ *  Nome: d1
+ *  Objetivo: implementar o modo de disparo 1 do computador
+ *
+ *  Parametros de entrada: n/a
+ *  Paremetros de saida: n/a
+ */
+
+int d1_linha() {
+    int linha = rand() % (row+1);
+    return linha;
+}
+char d1_coluna() {
+    char coluna = (rand() % (column)) + 'A';
+    return coluna;
 }
 
 /**
@@ -437,15 +452,38 @@ int disparo_j1(disparo_linha, disparo_coluna) {
  *  Paremetros de saida: n/a
  */
 
-int modo_j1() {
-    int disparo_linha;
-    int vitoria;
+int modo_j1(disparos, jogo) {
+    int ordem[9][2][1] = {{{1}, {1}}, {{0}, {1}}, {{2}, {1}}, {{1}, {0}}, {{1}, {2}}, {{0}, {0}}, {{2}, {2}}, {{0}, {2}}, {{2}, {0}}};
+    int disparo_linha, vitoria, i1=0;
     char disparo_coluna;
+    time_t t;
+    srand((unsigned) time(&t));
 
-    printf("\n\n\t- Insira as coordenadas de disparo (coluna-linha): ");
-    scanf(" %c %i", &disparo_coluna, &disparo_linha);
-    printf("\n");
+    if(jogo == 1) {
+        //do {
+            printf("\n\n\t- Insira as coordenadas de disparo (coluna-linha): ");
+            scanf(" %c %i", &disparo_coluna, &disparo_linha);
+            printf("\n");
+        //}while((disparo_coluna < 'A' || disparo_coluna > ('A' + column)) || (disparo_linha < 1 || disparo_linha > row)); NÃO FUNCIONA (AINDA)
 
+    }
+    else if (jogo == 2) {
+        if (disparos == 1) {
+            do {
+                disparo_linha = d1_linha();
+                disparo_coluna = d1_coluna();
+                usleep(800);
+            }while(table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ');
+        }
+        if (disparos == 2) {
+            //do {
+                //disparo_linha = ordem[i1][0][0] + *3;
+                //disparo_coluna = ordem[i1][1][0] + *3;
+                i1++;
+            //}while();
+
+        }
+    }
     //se o utilizador inserir uma coordenada já jogada, conta_pecas não é afetado com a próxima função
     if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ') {
         if(table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-'){
@@ -462,35 +500,44 @@ int modo_j1() {
 
 /**
  *  Nome: modo_jogo
- *  Objetivo: escolher modos de jogo???
+ *  Objetivo: escolher modos de jogo
  *
- *  Parametros de entrada: jogo
- *  Paremetros de saida:
+ *  Parametros de entrada: modo_pecas, jogo, disparos
+ *  Paremetros de saida: n/a
  */
 
-int modo_jogo(modo_pecas, jogo) {
-    if(jogo == 1) {
-        int i1, i2, vitoria;
+int modo_jogo(modo_pecas, jogo, disparos) {
+    if(jogo == 1 || jogo == 2) {
+        int i1, i2, vitoria, jogadas = 0;
         //Inicializar o tabuleiro de jogo j1 a ' '
         for(i1 = 0; i1 < row; i1++) {
             for (i2 = 0; i2 < column; i2++) {
                 table[1][i1][i2] = ' ';
             }
         }
-        // calcula número de células ocupadas por números na matriz
-        for(i1=1; i1<=9; i1++) {
-            conta_pecas += tipo[i1]*i1;
-        }
+        time_t comeco = time(NULL);
         do {
-            vitoria = modo_j1();
+            vitoria = modo_j1(disparos, jogo);
+            jogadas++;
             if (vitoria == 0)
-                printf("%i\n", conta_pecas);
+                system("clear");
                 printBoard(modo_pecas, jogo);
+                printf("\n");
+                //printf("\n\n%i", conta_pecas);
         }while(vitoria == 0);
+
         system("clear");
+        printBoard(modo_pecas, jogo);
+
+        time_t fim = time(NULL);
+        int tempo_jogo = fim - comeco;
+
+        printf("\n\n    %i jogadas em %i segundos. \n", jogadas, tempo_jogo);
+
     }
     return 0;
 }
+
 /**
  *  Nome: menu_ajuda
  *  Objetivo: ajuda ao utilizador
@@ -498,6 +545,7 @@ int modo_jogo(modo_pecas, jogo) {
  *  Parametros de entrada:
  *  Paremetros de saida:
  */
+
 void menu_ajuda(char *program){
 
     printf("Jogo da Batalha Naval.\n\n");
@@ -530,8 +578,7 @@ void menu_ajuda(char *program){
 
 int main(int argc, char *argv[])
 {
-    //tamanho_jogo();
-    int modo_pecas,jogo,disparos;
+    int modo_pecas,jogo,disparos,i1;
     int opt = 'h';
     opterr = 0;
     while((opt=getopt(argc, argv, "t:j:p:d:1:2:3:4:5:6:7:8:h")) != -1){
@@ -542,6 +589,9 @@ int main(int argc, char *argv[])
                 break;
             case 'j':
                 sscanf(optarg, "%d", &jogo);
+                if (jogo == 2) {
+                    modo_pecas = 2;
+                }
                 break;
             case 'p':
                 sscanf(optarg, "%d", &modo_pecas);
@@ -579,12 +629,18 @@ int main(int argc, char *argv[])
                 break;
         }
     }
+    for(i1=1; i1<=9; i1++) {
+        conta_pecas += tipo[i1]*i1;
+    }
     tipo[0] = (row*column)/9-tipo[1]-tipo[2]-tipo[3]-tipo[4]-tipo[5]-tipo[6]-tipo[7]-tipo[8];
     modo_pos(modo_pecas);
     if((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0))
         exit(-1);
-    modo_jogo(modo_pecas, jogo);
-    printBoard(modo_pecas, jogo);
+    // calcula número de células ocupadas por números na matriz
+    for(i1=1; i1<=9; i1++) {
+        conta_pecas += tipo[i1]*i1;
+    }
+    modo_jogo(modo_pecas, jogo, disparos);
 
+    return EXIT_SUCCESS;
 }
-
