@@ -5,6 +5,7 @@
 
 int row=9, column=9;
 int tipo [9] = {0,0,0,0,0,0,0,0,0};
+int sequencia = 0, indicador_l = 0, indicador_c = 0, incrementa = 0;
 int peca, conta_pecas;
 char table[1][15][24] = {{{' '}}};
 char pecas[43][3][3] = {
@@ -435,12 +436,22 @@ char d1_coluna() {
  *  Paremetros de saida: vitoria
  */
 
-int disparo_j1(disparo_linha, disparo_coluna) {
-    if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-') {
-        conta_pecas --;
-        if (conta_pecas == 0)
-            return 1;
+int disparo_j1(disparo_linha, disparo_coluna, disparos) {
+    if (disparos == 1) {
+        if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-') {
+            conta_pecas --;
+            if (conta_pecas == 0)
+                return 1;
+        }
     }
+    if (disparos == 2) {
+        if (table[1][disparo_linha - 2][disparo_coluna - 17] != '-') {
+            conta_pecas --;
+            if (conta_pecas == 0)
+                return 1;
+        }
+    }
+
     return 0;
 }
 
@@ -454,7 +465,7 @@ int disparo_j1(disparo_linha, disparo_coluna) {
 
 int modo_j1(disparos, jogo) {
     int ordem[9][2][1] = {{{1}, {1}}, {{0}, {1}}, {{2}, {1}}, {{1}, {0}}, {{1}, {2}}, {{0}, {0}}, {{2}, {2}}, {{0}, {2}}, {{2}, {0}}};
-    int disparo_linha, vitoria, i1=0;
+    int disparo_linha, vitoria;
     char disparo_coluna;
     time_t t;
     srand((unsigned) time(&t));
@@ -475,28 +486,144 @@ int modo_j1(disparos, jogo) {
                 usleep(800);
             }while(table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ');
         }
-        if (disparos == 2) {
-            //do {
-                //disparo_linha = ordem[i1][0][0] + *3;
-                //disparo_coluna = ordem[i1][1][0] + *3;
-                i1++;
-            //}while();
+        else if (disparos == 2) {
+            if(sequencia == 9) {
+                sequencia = 0; // reset do ciclo
+                if(indicador_c > (column/3 - 2)) {
+                    indicador_c = 0; // volta para as primeiras 3 colunas
+                    indicador_l ++; } // desce para as proximas 3 linhas
+                else {
+                    indicador_c ++; } // passa para as proximas 3 colunas
+            }
 
+            disparo_linha = ordem[sequencia][0][0] + (indicador_l*3);
+            disparo_coluna = ordem[sequencia][1][0] + (indicador_c*3) + 'A';
+
+            sequencia++; // passa para o proximo quadrado da sequencia pre-definida
+            usleep(80000);
+
+            switch(table[0][disparo_linha - 2][disparo_coluna - 17]) {
+                case '1':
+                    sequencia=0;
+                    if(indicador_c > (column/3 - 2)) {
+                        indicador_c = 0; // volta para as primeiras 3 colunas
+                        indicador_l ++; } // desce para as proximas 3 linhas
+                    else {
+                        indicador_c ++; } // passa para as proximas 3 colunas
+                    break;
+                case '2':
+                    incrementa++;
+                    if (incrementa == 2) {
+                        incrementa=0;
+                        sequencia=0;
+                        if(indicador_c > (column/3 - 2)) {
+                            indicador_c = 0; // volta para as primeiras 3 colunas
+                            indicador_l ++; } // desce para as proximas 3 linhas
+                        else {
+                            indicador_c ++; } // passa para as proximas 3 colunas
+                    }
+                    break;
+                case '3':
+                    incrementa++;
+                    if (incrementa == 3) {
+                        incrementa=0;
+                        sequencia=0;
+                        if(indicador_c > (column/3 - 2)) {
+                            indicador_c = 0; // volta para as primeiras 3 colunas
+                            indicador_l ++; } // desce para as proximas 3 linhas
+                        else {
+                            indicador_c ++; } // passa para as proximas 3 colunas
+                    }
+                    break;
+                case '4':
+                    incrementa++;
+                    if (incrementa == 4) {
+                        incrementa=0;
+                        sequencia=0;
+                        if(indicador_c > (column/3 - 2)) {
+                            indicador_c = 0; // volta para as primeiras 3 colunas
+                            indicador_l ++; } // desce para as proximas 3 linhas
+                        else {
+                            indicador_c ++; } // passa para as proximas 3 colunas
+                    }
+                    break;
+                case '5':
+                    incrementa++;
+                    if (incrementa == 5) {
+                        sequencia=0;
+                        incrementa=0;
+                        if(indicador_c > (column/3 - 2)) {
+                            indicador_c = 0; // volta para as primeiras 3 colunas
+                            indicador_l ++; } // desce para as proximas 3 linhas
+                        else {
+                            indicador_c ++; } // passa para as proximas 3 colunas
+                    }
+                    break;
+                case '6':
+                    incrementa++;
+                    if (incrementa == 6) {
+                        sequencia=0;
+                        incrementa=0;
+                        if(indicador_c > (column/3 - 2)) {
+                            indicador_c = 0; // volta para as primeiras 3 colunas
+                            indicador_l ++; } // desce para as proximas 3 linhas
+                        else {
+                            indicador_c ++; } // passa para as proximas 3 colunas
+                    }
+                    break;
+                case '7':
+                    incrementa++;
+                    if (incrementa == 7) {
+                        sequencia=0;
+                        incrementa=0;
+                        if(indicador_c > (column/3 - 2)) {
+                            indicador_c = 0; // volta para as primeiras 3 colunas
+                            indicador_l ++; } // desce para as proximas 3 linhas
+                        else {
+                            indicador_c ++; } // passa para as proximas 3 colunas
+                    }
+                    break;
+                case '8':
+                    incrementa++;
+                    if (incrementa == 8) {
+                        sequencia=0;
+                        incrementa=0;
+                        if(indicador_c > (column/3 - 2)) {
+                            indicador_c = 0; // volta para as primeiras 3 colunas
+                            indicador_l ++; } // desce para as proximas 3 linhas
+                        else {
+                            indicador_c ++; } // passa para as proximas 3 colunas
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
     //se o utilizador inserir uma coordenada já jogada, conta_pecas não é afetado com a próxima função
-    if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ') {
-        if(table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-'){
-            conta_pecas++;
+
+    if (disparos == 1) {
+        if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ') {
+            if(table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-'){
+                conta_pecas++;
+            }
         }
+        table[1][row - disparo_linha - 2][disparo_coluna - 17] = table[0][row - disparo_linha - 2][disparo_coluna - 17];
+    }
+    if (disparos == 2) {
+        if (table[1][disparo_linha - 2][disparo_coluna - 17] != ' ') {
+            if(table[1][disparo_linha - 2][disparo_coluna - 17] != '-'){
+                conta_pecas++;
+            }
+        }
+        table[1][disparo_linha - 2][disparo_coluna - 17] = table[0][disparo_linha - 2][disparo_coluna - 17];
     }
 
-    table[1][row - disparo_linha - 2][disparo_coluna - 17] = table[0][row - disparo_linha - 2][disparo_coluna - 17];
-
     //condição de vitória
-    vitoria = disparo_j1(disparo_linha, disparo_coluna);
+    vitoria = disparo_j1(disparo_linha, disparo_coluna, disparos);
     return vitoria;
 }
+
 
 /**
  *  Nome: modo_jogo
