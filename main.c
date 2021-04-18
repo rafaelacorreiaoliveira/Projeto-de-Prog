@@ -444,7 +444,7 @@ int disparo_j1(disparo_linha, disparo_coluna, disparos) {
                 return 1;
         }
     }
-    if (disparos == 2) {
+    if (disparos == 2 || disparos == 3) {
         if (table[1][disparo_linha - 2][disparo_coluna - 17] != '-') {
             conta_pecas --;
             if (conta_pecas == 0)
@@ -467,6 +467,7 @@ int modo_j1(disparos, jogo) {
     int ordem[9][2][1] = {{{1}, {1}}, {{0}, {1}}, {{2}, {1}}, {{1}, {0}}, {{1}, {2}}, {{0}, {0}}, {{2}, {2}}, {{0}, {2}}, {{2}, {0}}};
     int disparo_linha, vitoria;
     char disparo_coluna;
+    char check1, check2, check3, check4;
     time_t t;
     srand((unsigned) time(&t));
 
@@ -486,7 +487,7 @@ int modo_j1(disparos, jogo) {
                 usleep(800);
             }while(table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ');
         }
-        else if (disparos == 2) {
+        else if (disparos == 2 || disparos == 3) {
             if(sequencia == 9) {
                 sequencia = 0; // reset do ciclo
                 if(indicador_c > (column/3 - 2)) {
@@ -610,15 +611,34 @@ int modo_j1(disparos, jogo) {
         }
         table[1][row - disparo_linha - 2][disparo_coluna - 17] = table[0][row - disparo_linha - 2][disparo_coluna - 17];
     }
-    if (disparos == 2) {
+    if (disparos == 2 || disparos == 3) {
         if (table[1][disparo_linha - 2][disparo_coluna - 17] != ' ') {
             if(table[1][disparo_linha - 2][disparo_coluna - 17] != '-'){
                 conta_pecas++;
             }
         }
         table[1][disparo_linha - 2][disparo_coluna - 17] = table[0][disparo_linha - 2][disparo_coluna - 17];
-    }
+        if(disparos == 3) {
+            if((indicador_l==0) && (indicador_c>0)) { // verificar primeiras 3 linhas
+                if (sequencia == 3 || sequencia == 5 || sequencia == 8) {
+                    check1 = table[0][disparo_linha - 2][disparo_coluna - 17]; //referencia
+                    check2 = table[0][disparo_linha - 3][disparo_coluna - 17]; //atras
+                    if(sequencia == 5) {
+                        check3 = '-'; }
+                    else {
+                    check3 = table[0][disparo_linha - 3][disparo_coluna - 18]; } //cima
+                    check4 = table[0][disparo_linha - 3][disparo_coluna - 16]; //baixo
 
+                    if((check1 == '-' && check2 != '-') || (check1 == '-' && check2 != ' '))
+                        table[1][disparo_linha - 2][disparo_coluna - 17] = 'x';
+                    if((check1 == '-' && check3 != '-') || (check1 == '-' && check3 != ' '))
+                        table[1][disparo_linha - 2][disparo_coluna - 17] = 'x';
+                    if((check1 == '-' && check4 != '-') || (check1 == '-' && check4 != ' '))
+                        table[1][disparo_linha - 2][disparo_coluna - 17] = 'x';
+                }
+            }
+        }
+    }
     //condição de vitória
     vitoria = disparo_j1(disparo_linha, disparo_coluna, disparos);
     return vitoria;
