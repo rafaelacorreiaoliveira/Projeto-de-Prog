@@ -465,18 +465,17 @@ int disparo_j1(disparo_linha, disparo_coluna, disparos) {
 
 int modo_j1(disparos, jogo) {
     int ordem[9][2][1] = {{{1}, {1}}, {{0}, {1}}, {{2}, {1}}, {{1}, {0}}, {{1}, {2}}, {{0}, {0}}, {{2}, {2}}, {{0}, {2}}, {{2}, {0}}};
-    int disparo_linha = 0, vitoria=0;
-    char disparo_coluna = '\0';
+    int disparo_linha = 0, vitoria=0, insurance=0;
+    char disparo_coluna = {' '};
     time_t t;
     srand((unsigned) time(&t));
 
     if(jogo == 1) {
-        //do {
+        do {
             printf("\n\n\t- Insira as coordenadas de disparo (coluna-linha): ");
             scanf(" %c %i", &disparo_coluna, &disparo_linha);
             printf("\n");
-        //}while((disparo_coluna < 'A' || disparo_coluna > ('A' + column)) || (disparo_linha < 1 || disparo_linha > row)); NÃO FUNCIONA (AINDA)
-
+        }while((disparo_coluna < 'A' || disparo_coluna > ('A' + column)) || (disparo_linha < 1 || disparo_linha > row));
     }
     else if (jogo == 2) {
         if (disparos == 1) {
@@ -495,208 +494,151 @@ int modo_j1(disparos, jogo) {
                 else {
                     indicador_c ++; } // passa para as proximas 3 colunas
             }
-
             disparo_linha = ordem[sequencia][0][0] + (indicador_l*3);
             disparo_coluna = ordem[sequencia][1][0] + (indicador_c*3) + 'A';
 
-            if (disparos == 3 && (table[0][disparo_linha - 2][disparo_coluna - 17] == '-')) {
+            if ((disparos == 3) && (table[0][disparo_linha - 2][disparo_coluna - 17] == '-')) {
                 //  PRIMEIRAS 3 LINHAS 3,5,8
                 if((indicador_l==0) && (indicador_c>0)) {
                     switch(sequencia) {
                 case 3: case 8:
-                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') // Atras
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
                         sequencia++;
-                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Atras & Cima
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
                         sequencia++;
-                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Atras & Baixo
+                        break; }
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
                         sequencia++;
+                        break; }
                     break;
                 case 5:
-                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') // Atras
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
                         sequencia++;
-                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Atras & Baixo
+                        break; }
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
                         sequencia++;
+                        break; }
                     break;
                 default:
                     break;
                     }
                 }
-
                 // PRIMEIRAS 3 COLUNAS 1,5,7
-                if((indicador_l>0) && (indicador_c == 0)) {
+                else if((indicador_l>0) && (indicador_c == 0)) {
                     switch(sequencia) {
                 case 1: case 7:
-                    if(table[0][disparo_linha - 1][disparo_coluna - 17] != '-') // Cima
+                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
                         sequencia++;
-                    if(table[0][disparo_linha - 1][disparo_coluna - 16] != '-') // Cima & Direita
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
                         sequencia++;
-                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Cima & Esquerda
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Cima & Esquerda
                         sequencia++;
+                        break; }
                     break;
                 case 5:
-                    if(table[0][disparo_linha - 1][disparo_coluna - 17] != '-') // Cima
+                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') {// Cima
                         sequencia++;
-                    if(table[0][disparo_linha - 1][disparo_coluna - 16] != '-') // Cima & Direita
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
                         sequencia++;
+                        break; }
                     break;
                 default:
                     break;
                     }
                 }
-
-                /*// RESTO DO TABULEIRO 1,3,4,7,8
-                if((indicador_l>0) && indicador_c>0) {
+                // RESTO DO TABULEIRO 1,3,4,7,8
+                else if((indicador_l>0) && indicador_c>0) {
                     switch(sequencia) {
                 case 3:
-                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') // Atras
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
                         sequencia++;
-                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Atras & Cima
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
                         sequencia++;
-                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Atras & Baixo
+                        break; }
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
                         sequencia++;
-                case 5:
-                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') // Atras
-                        sequencia++;
-                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Atras & Cima
-                        sequencia++;
-                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Atras & Baixo
-                        sequencia++;
-                    if(table[0][disparo_linha - 1][disparo_coluna - 17] != '-') // Cima
-                        sequencia++;
-                    if(table[0][disparo_linha - 1][disparo_coluna - 16] != '-') // Cima & Direita
-                        sequencia++;
+                        break; }
                     break;
-                case 8:
-                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') // Atras
+                case 5:
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
                         sequencia++;
-                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Atras & Cima
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
                         sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
+                        sequencia++;
+                        break; }
                     break;
                 case 1:
-                    if(table[0][disparo_linha - 1][disparo_coluna - 17] != '-') // Cima
+                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
                         sequencia++;
-                    if(table[0][disparo_linha - 1][disparo_coluna - 16] != '-') // Cima & Direita
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
                         sequencia++;
-                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Cima & Esquerda
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Cima & Esquerda
                         sequencia++;
+                        break; }
                     break;
                 case 7:
-                    if(table[0][disparo_linha - 1][disparo_coluna - 17] != '-') // Cima
+                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
                         sequencia++;
-                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Cima & Esquerda
+                        break; } // CUIDADO
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Cima & Esquerda
                         sequencia++;
+                        break;
+                case 8:
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
+                        sequencia++;
+                        break;}
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
+                        sequencia++;
+                        break; }
+                    break;
                 default:
                     break;
                     }
-                } */
+                }
             }
 
-            disparo_linha = ordem[sequencia][0][0] + (indicador_l*3);
-            disparo_coluna = ordem[sequencia][1][0] + (indicador_c*3) + 'A';
-            sequencia++; // passa para o proximo quadrado da sequencia pre-definida
-            usleep(500000);
+            if (sequencia == 9)
+                insurance = 8;
 
-            switch(table[0][disparo_linha - 2][disparo_coluna - 17]) {
-                case '1':
-                    sequencia=0;
+            disparo_linha = ordem[sequencia-insurance][0][0] + (indicador_l*3);
+            disparo_coluna = ordem[sequencia-insurance][1][0] + (indicador_c*3) + 'A';
+            sequencia++; // passa para o proximo quadrado da sequencia pre-definida
+            usleep(90000);
+
+            if (table[0][disparo_linha - 2][disparo_coluna - 17] != '-') {
+                char sinal = table[0][disparo_linha - 2][disparo_coluna - 17];
+                incrementa++;
+                if(incrementa == (sinal - '0')) {
+                    incrementa = 0;
+                    sequencia = 0;
                     if(indicador_c > (column/3 - 2)) {
                         indicador_c = 0; // volta para as primeiras 3 colunas
                         indicador_l ++; } // desce para as proximas 3 linhas
                     else {
                         indicador_c ++; } // passa para as proximas 3 colunas
-                    break;
-                case '2':
-                    incrementa++;
-                    if (incrementa == 2) {
-                        incrementa=0;
-                        sequencia=0;
-                        if(indicador_c > (column/3 - 2)) {
-                            indicador_c = 0; // volta para as primeiras 3 colunas
-                            indicador_l ++; } // desce para as proximas 3 linhas
-                        else {
-                            indicador_c ++; } // passa para as proximas 3 colunas
-                    }
-                    break;
-                case '3':
-                    incrementa++;
-                    if (incrementa == 3) {
-                        incrementa=0;
-                        sequencia=0;
-                        if(indicador_c > (column/3 - 2)) {
-                            indicador_c = 0; // volta para as primeiras 3 colunas
-                            indicador_l ++; } // desce para as proximas 3 linhas
-                        else {
-                            indicador_c ++; } // passa para as proximas 3 colunas
-                    }
-                    break;
-                case '4':
-                    incrementa++;
-                    if (incrementa == 4) {
-                        incrementa=0;
-                        sequencia=0;
-                        if(indicador_c > (column/3 - 2)) {
-                            indicador_c = 0; // volta para as primeiras 3 colunas
-                            indicador_l ++; } // desce para as proximas 3 linhas
-                        else {
-                            indicador_c ++; } // passa para as proximas 3 colunas
-                    }
-                    break;
-                case '5':
-                    incrementa++;
-                    if (incrementa == 5) {
-                        sequencia=0;
-                        incrementa=0;
-                        if(indicador_c > (column/3 - 2)) {
-                            indicador_c = 0; // volta para as primeiras 3 colunas
-                            indicador_l ++; } // desce para as proximas 3 linhas
-                        else {
-                            indicador_c ++; } // passa para as proximas 3 colunas
-                    }
-                    break;
-                case '6':
-                    incrementa++;
-                    if (incrementa == 6) {
-                        sequencia=0;
-                        incrementa=0;
-                        if(indicador_c > (column/3 - 2)) {
-                            indicador_c = 0; // volta para as primeiras 3 colunas
-                            indicador_l ++; } // desce para as proximas 3 linhas
-                        else {
-                            indicador_c ++; } // passa para as proximas 3 colunas
-                    }
-                    break;
-                case '7':
-                    incrementa++;
-                    if (incrementa == 7) {
-                        sequencia=0;
-                        incrementa=0;
-                        if(indicador_c > (column/3 - 2)) {
-                            indicador_c = 0; // volta para as primeiras 3 colunas
-                            indicador_l ++; } // desce para as proximas 3 linhas
-                        else {
-                            indicador_c ++; } // passa para as proximas 3 colunas
-                    }
-                    break;
-                case '8':
-                    incrementa++;
-                    if (incrementa == 8) {
-                        sequencia=0;
-                        incrementa=0;
-                        if(indicador_c > (column/3 - 2)) {
-                            indicador_c = 0; // volta para as primeiras 3 colunas
-                            indicador_l ++; } // desce para as proximas 3 linhas
-                        else {
-                            indicador_c ++; } // passa para as proximas 3 colunas
-                    }
-                    break;
-                default:
-                    break;
+                }
             }
         }
     }
     //se o utilizador inserir uma coordenada já jogada, conta_pecas não é afetado com a próxima função
 
-    if (disparos == 1) {
+    if (disparos == 1 || jogo == 1) {
         if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ') {
             if(table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-'){
                 conta_pecas++;
@@ -711,9 +653,6 @@ int modo_j1(disparos, jogo) {
             }
         }
         table[1][disparo_linha - 2][disparo_coluna - 17] = table[0][disparo_linha - 2][disparo_coluna - 17];
-        if(disparos == 3) {
-
-        }
     }
     //condição de vitória
     vitoria = disparo_j1(disparo_linha, disparo_coluna, disparos);
@@ -799,8 +738,7 @@ void menu_ajuda(char *program){
  */
 
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     int modo_pecas,jogo,disparos,i1;
     int opt = 'h';
     opterr = 0;
@@ -867,3 +805,4 @@ int main(int argc, char *argv[])
 
     return EXIT_SUCCESS;
 }
+
