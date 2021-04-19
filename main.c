@@ -465,9 +465,8 @@ int disparo_j1(disparo_linha, disparo_coluna, disparos) {
 
 int modo_j1(disparos, jogo) {
     int ordem[9][2][1] = {{{1}, {1}}, {{0}, {1}}, {{2}, {1}}, {{1}, {0}}, {{1}, {2}}, {{0}, {0}}, {{2}, {2}}, {{0}, {2}}, {{2}, {0}}};
-    int disparo_linha, vitoria;
-    char disparo_coluna;
-    char check1, check2, check3, check4;
+    int disparo_linha = 0, vitoria=0;
+    char disparo_coluna = '\0';
     time_t t;
     srand((unsigned) time(&t));
 
@@ -488,7 +487,7 @@ int modo_j1(disparos, jogo) {
             }while(table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ');
         }
         else if (disparos == 2 || disparos == 3) {
-            if(sequencia == 9) {
+            if(sequencia >= 9) {
                 sequencia = 0; // reset do ciclo
                 if(indicador_c > (column/3 - 2)) {
                     indicador_c = 0; // volta para as primeiras 3 colunas
@@ -500,8 +499,102 @@ int modo_j1(disparos, jogo) {
             disparo_linha = ordem[sequencia][0][0] + (indicador_l*3);
             disparo_coluna = ordem[sequencia][1][0] + (indicador_c*3) + 'A';
 
+            if (disparos == 3 && (table[0][disparo_linha - 2][disparo_coluna - 17] == '-')) {
+                //  PRIMEIRAS 3 LINHAS 3,5,8
+                if((indicador_l==0) && (indicador_c>0)) {
+                    switch(sequencia) {
+                case 3: case 8:
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') // Atras
+                        sequencia++;
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Atras & Cima
+                        sequencia++;
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Atras & Baixo
+                        sequencia++;
+                    break;
+                case 5:
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') // Atras
+                        sequencia++;
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Atras & Baixo
+                        sequencia++;
+                    break;
+                default:
+                    break;
+                    }
+                }
+
+                // PRIMEIRAS 3 COLUNAS 1,5,7
+                if((indicador_l>0) && (indicador_c == 0)) {
+                    switch(sequencia) {
+                case 1: case 7:
+                    if(table[0][disparo_linha - 1][disparo_coluna - 17] != '-') // Cima
+                        sequencia++;
+                    if(table[0][disparo_linha - 1][disparo_coluna - 16] != '-') // Cima & Direita
+                        sequencia++;
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Cima & Esquerda
+                        sequencia++;
+                    break;
+                case 5:
+                    if(table[0][disparo_linha - 1][disparo_coluna - 17] != '-') // Cima
+                        sequencia++;
+                    if(table[0][disparo_linha - 1][disparo_coluna - 16] != '-') // Cima & Direita
+                        sequencia++;
+                    break;
+                default:
+                    break;
+                    }
+                }
+
+                /*// RESTO DO TABULEIRO 1,3,4,7,8
+                if((indicador_l>0) && indicador_c>0) {
+                    switch(sequencia) {
+                case 3:
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') // Atras
+                        sequencia++;
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Atras & Cima
+                        sequencia++;
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Atras & Baixo
+                        sequencia++;
+                case 5:
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') // Atras
+                        sequencia++;
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Atras & Cima
+                        sequencia++;
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Atras & Baixo
+                        sequencia++;
+                    if(table[0][disparo_linha - 1][disparo_coluna - 17] != '-') // Cima
+                        sequencia++;
+                    if(table[0][disparo_linha - 1][disparo_coluna - 16] != '-') // Cima & Direita
+                        sequencia++;
+                    break;
+                case 8:
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') // Atras
+                        sequencia++;
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Atras & Cima
+                        sequencia++;
+                    break;
+                case 1:
+                    if(table[0][disparo_linha - 1][disparo_coluna - 17] != '-') // Cima
+                        sequencia++;
+                    if(table[0][disparo_linha - 1][disparo_coluna - 16] != '-') // Cima & Direita
+                        sequencia++;
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Cima & Esquerda
+                        sequencia++;
+                    break;
+                case 7:
+                    if(table[0][disparo_linha - 1][disparo_coluna - 17] != '-') // Cima
+                        sequencia++;
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') // Cima & Esquerda
+                        sequencia++;
+                default:
+                    break;
+                    }
+                } */
+            }
+
+            disparo_linha = ordem[sequencia][0][0] + (indicador_l*3);
+            disparo_coluna = ordem[sequencia][1][0] + (indicador_c*3) + 'A';
             sequencia++; // passa para o proximo quadrado da sequencia pre-definida
-            usleep(80000);
+            usleep(500000);
 
             switch(table[0][disparo_linha - 2][disparo_coluna - 17]) {
                 case '1':
@@ -619,24 +712,7 @@ int modo_j1(disparos, jogo) {
         }
         table[1][disparo_linha - 2][disparo_coluna - 17] = table[0][disparo_linha - 2][disparo_coluna - 17];
         if(disparos == 3) {
-            if((indicador_l==0) && (indicador_c>0)) { // verificar primeiras 3 linhas
-                if (sequencia == 3 || sequencia == 5 || sequencia == 8) {
-                    check1 = table[0][disparo_linha - 2][disparo_coluna - 17]; //referencia
-                    check2 = table[0][disparo_linha - 3][disparo_coluna - 17]; //atras
-                    if(sequencia == 5) {
-                        check3 = '-'; }
-                    else {
-                    check3 = table[0][disparo_linha - 3][disparo_coluna - 18]; } //cima
-                    check4 = table[0][disparo_linha - 3][disparo_coluna - 16]; //baixo
 
-                    if((check1 == '-' && check2 != '-') || (check1 == '-' && check2 != ' '))
-                        table[1][disparo_linha - 2][disparo_coluna - 17] = 'x';
-                    if((check1 == '-' && check3 != '-') || (check1 == '-' && check3 != ' '))
-                        table[1][disparo_linha - 2][disparo_coluna - 17] = 'x';
-                    if((check1 == '-' && check4 != '-') || (check1 == '-' && check4 != ' '))
-                        table[1][disparo_linha - 2][disparo_coluna - 17] = 'x';
-                }
-            }
         }
     }
     //condição de vitória
@@ -701,7 +777,7 @@ void menu_ajuda(char *program){
     printf("-t\t dimensões do tabuleiro (linha x coluna).");
     printf("-j\t modos de jogo.");
     printf("-p\t modo de posicionamento de paças pelo computador (1 a 2)");
-    printf("-d\t modos de disparo de peças pelo computador ( a 3)");
+    printf("-d\t modos de disparo de peças pelo computador (1 a 3)");
     printf("-1\t número de peças do tipo 1");
     printf("-2\t número de peças do tipo 2");
     printf("-3\t número de peças do tipo 3");
