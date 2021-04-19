@@ -3,12 +3,13 @@
 #include <time.h>
 #include <unistd.h>
 
-int row=9, column=9;
-int tipo [9] = {0,0,0,0,0,0,0,0,0};
+//VARIÁVEIS GLOBAIS, variáveis essenciais chamadas várias vezes ao longo do programa.
+int row=9, column=9; //variáveis que representam o tamanho do tabuleiro, valor inicial igual a 9 devido à dimensão mínima do tabuleiro.
+int tipo [9] = {0,0,0,0,0,0,0,0,0}; //array que representa as peças, cada posição representa uma peça.
 int sequencia = 0, indicador_l = 0, indicador_c = 0, incrementa = 0;
 int peca, conta_pecas;
 char table[1][15][24] = {{{' '}}};
-char pecas[43][3][3] = {
+char pecas[43][3][3] = { //array que representa todas as posições possiveis das peças
     {{'1','-','-'}, {'-','-','-'}, {'-','-','-'}},
     {{'-','1','-'}, {'-','-','-'}, {'-','-','-'}},
     {{'-','-','1'}, {'-','-','-'}, {'-','-','-'}},
@@ -58,7 +59,7 @@ char pecas[43][3][3] = {
  *  Nome: printBoard
  *  Objetivo: representar no ecrã valores previamente carregados no tabuleiro dedicado ao correto modo de jogo
  *
- *  Parametros de entrada: n/a
+ *  Parametros de entrada: modo_pecas, jogo, tempo_jogo
  *  Parametros de saida: n/a
  */
 
@@ -78,7 +79,7 @@ void printBoard(modo_pecas, jogo, tempo_jogo) {
         printf("\n\n");
     }
 
-    // modo de jogo j0 ou j1/j2 (dependendo da variável modo)
+    // modo de jogo j0, j1 ou j2
     if(jogo == 1 || jogo == 2)
         modo=1;
     for (i1 = 0; i1 < row; i1++) {
@@ -99,15 +100,13 @@ void printBoard(modo_pecas, jogo, tempo_jogo) {
     for(i1=0; i1<column; i1++) {
         printf(" %c", letters[i1]);
     }
-    //if(jogo == 1 || jogo == 2)
-    //    printf("\n\n O jogo demorou %i segundos.", tempo);
 }
 
 /**
  *  Nome: restricao_1
  *  Objetivo: implementar a restrição 1 relativamente á disposição das peças
  *
- *  Parametros de entrada: for1, for2, modo_pecas
+ *  Parametros de entrada: for1, for2, modo_pecas, contador1
  *  Paremetros de saida: n/a
  */
 
@@ -243,7 +242,7 @@ int restricao_1(for1, for2, modo_pecas, contador1) {
  *  Objetivo: obter a partir do utilizador as peças a introduzir no tabuleiro
  *
  *  Parametros de entrada: n/a
- *  Paremetros de saida:
+ *  Paremetros de saida: n/a
  */
 
 void escolha_pecas() {
@@ -265,7 +264,6 @@ void escolha_pecas() {
         printf("Número de peças inválido.\n");
         exit(-1);
         }
-
     }
     system("clear");
 }
@@ -275,7 +273,7 @@ void escolha_pecas() {
  *  Objetivo: randomização da variante de uma peça, utilizada no modo de posicionamento 2
  *
  *  Parametros de entrada: a, modo_pecas
- *  Paremetros de saida: n/a
+ *  Paremetros de saida: a
  */
 
 
@@ -318,7 +316,7 @@ int rand_pecas(a, modo_pecas) {
 
 /**
  *  Nome: contador
- *  Objetivo: contar o tipo de peças geradas no modo p1
+ *  Objetivo: contar o número e o tipo de peças colocadas nos modos de posicionamento
  *
  *  Parametros de entrada: a
  *  Paremetros de saida: n/a
@@ -364,7 +362,7 @@ int contador(a) {
  *  Nome: modo_pos
  *  Objetivo: correr o programa de acordo com o modo selecionado
  *
- *  Parametros de entrada: n/a
+ *  Parametros de entrada: modo_pecas
  *  Paremetros de saida: n/a
  */
 
@@ -412,11 +410,11 @@ void modo_pos(int modo_pecas) {
 }
 
 /**
- *  Nome: d1
- *  Objetivo: implementar o modo de disparo 1 do computador
+ *  Nome: d1_linha e d1_coluna
+ *  Objetivo: implementar o modo de disparo 1 do computador (dispara em função das colunas e das linhas)
  *
  *  Parametros de entrada: n/a
- *  Paremetros de saida: n/a
+ *  Paremetros de saida: linha, coluna
  */
 
 int d1_linha() {
@@ -432,8 +430,8 @@ char d1_coluna() {
  *  Nome: disparo_j1
  *  Objetivo: verificar condição de vitória
  *
- *  Parametros de entrada: disparo_linha, disparo_coluna
- *  Paremetros de saida: vitoria
+ *  Parametros de entrada: disparo_linha, disparo_coluna, disparos
+ *  Paremetros de saida: n/a
  */
 
 int disparo_j1(disparo_linha, disparo_coluna, disparos) {
@@ -451,41 +449,41 @@ int disparo_j1(disparo_linha, disparo_coluna, disparos) {
                 return 1;
         }
     }
-
     return 0;
 }
 
  /**
  *  Nome: modo_j1
- *  Objetivo: implementar o modo de jogo 1
+ *  Objetivo: implementar o modo de jogo 1 e 2 (todos os modos de disparo incluidos)
  *
- *  Parametros de entrada: n/a
- *  Paremetros de saida: n/a
+ *  Parametros de entrada: disparos, jogo
+ *  Paremetros de saida: vitória
  */
 
 int modo_j1(disparos, jogo) {
+    //ordem dos disparos (centro, cima, baixo, esquerda, direita e cantos)
     int ordem[9][2][1] = {{{1}, {1}}, {{0}, {1}}, {{2}, {1}}, {{1}, {0}}, {{1}, {2}}, {{0}, {0}}, {{2}, {2}}, {{0}, {2}}, {{2}, {0}}};
     int disparo_linha = 0, vitoria=0, insurance=0;
     char disparo_coluna = {' '};
     time_t t;
     srand((unsigned) time(&t));
 
-    if(jogo == 1) {
+    if(jogo == 1) { //Modo de jogo 1
         do {
             printf("\n\n\t- Insira as coordenadas de disparo (coluna-linha): ");
             scanf(" %c %i", &disparo_coluna, &disparo_linha);
             printf("\n");
-        }while((disparo_coluna < 'A' || disparo_coluna > ('A' + column)) || (disparo_linha < 1 || disparo_linha > row));
+        }while((disparo_coluna < 'A' || disparo_coluna > ('A' + column)) || (disparo_linha < 1 || disparo_linha > row)); 
     }
-    else if (jogo == 2) {
-        if (disparos == 1) {
+    else if (jogo == 2) { //Modo de jogo 2
+        if (disparos == 1) { //Modo d1
             do {
                 disparo_linha = d1_linha();
                 disparo_coluna = d1_coluna();
                 usleep(800);
             }while(table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ');
         }
-        else if (disparos == 2 || disparos == 3) {
+        else if (disparos == 2 || disparos == 3) { //Modo d2 e d3 (d3 é uma evolução do modo d2)
             if(sequencia >= 9) {
                 sequencia = 0; // reset do ciclo
                 if(indicador_c > (column/3 - 2)) {
@@ -539,7 +537,7 @@ int modo_j1(disparos, jogo) {
                         break; }
                     break;
                 case 5:
-                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') {// Cima
+                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
                         sequencia++;
                         break; }
                     if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
@@ -659,9 +657,8 @@ int modo_j1(disparos, jogo) {
     return vitoria;
 }
 
-
 /**
- *  Nome: modo_jogo
+ *  Nome: modo_jogo, jogo, disparos
  *  Objetivo: escolher modos de jogo
  *
  *  Parametros de entrada: modo_pecas, jogo, disparos
@@ -685,7 +682,6 @@ int modo_jogo(modo_pecas, jogo, disparos) {
                 system("clear");
                 printBoard(modo_pecas, jogo);
                 printf("\n");
-                //printf("\n\n%i", conta_pecas);
         }while(vitoria == 0);
 
         system("clear");
@@ -694,7 +690,7 @@ int modo_jogo(modo_pecas, jogo, disparos) {
         time_t fim = time(NULL);
         int tempo_jogo = fim - comeco;
 
-        printf("\n\n    %i jogadas em %i segundos. \n", jogadas, tempo_jogo);
+        printf("\n\n   %i jogadas em %i segundos. \n", jogadas, tempo_jogo);
 
     }
     return 0;
@@ -702,10 +698,10 @@ int modo_jogo(modo_pecas, jogo, disparos) {
 
 /**
  *  Nome: menu_ajuda
- *  Objetivo: ajuda ao utilizador
+ *  Objetivo: ajuda ao utilizador, diz ao utilizador os argumentos que deve utilizar para conseguir correr o programa
  *
- *  Parametros de entrada:
- *  Paremetros de saida:
+ *  Parametros de entrada: program
+ *  Paremetros de saida: n/a
  */
 
 void menu_ajuda(char *program){
@@ -726,7 +722,9 @@ void menu_ajuda(char *program){
     printf("-6\t número de peças do tipo 6");
     printf("-7\t número de peças do tipo 7");
     printf("-8\t número de peças do tipo 8");
-    //COLOCAR EXEMPLOS
+    printf("Exemplos de programas que podem ser efetuados:\n");
+    printf("-j 1 -p 1\n");
+    printf("-j 2 -p 1 -d 3\n");
 }
 
 /**
@@ -736,7 +734,6 @@ void menu_ajuda(char *program){
  *  Parametros de entrada: n/a
  *  Paremetros de saida: n/a
  */
-
 
 int main(int argc, char *argv[]) {
     int modo_pecas,jogo,disparos,i1;
@@ -795,14 +792,13 @@ int main(int argc, char *argv[]) {
     }
     tipo[0] = (row*column)/9-tipo[1]-tipo[2]-tipo[3]-tipo[4]-tipo[5]-tipo[6]-tipo[7]-tipo[8];
     modo_pos(modo_pecas);
-    if((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0))
+    if((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0)) //restrição dos tamanhos do tabuleiro
         exit(-1);
     // calcula número de células ocupadas por números na matriz
     for(i1=1; i1<=9; i1++) {
         conta_pecas += tipo[i1]*i1;
     }
     modo_jogo(modo_pecas, jogo, disparos);
-
     return EXIT_SUCCESS;
 }
 
