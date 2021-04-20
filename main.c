@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <getopt.h>
 
 //VARIÁVEIS GLOBAIS, variáveis essenciais chamadas várias vezes ao longo do programa.
 int row=9, column=9; //variáveis que representam o tamanho do tabuleiro, valor inicial igual a 9 devido à dimensão mínima do tabuleiro.
-int tipo [9] = {0,0,0,0,0,0,0,0,0}; //array que representa as peças, cada posição representa uma peça.
+int tipo[9] = {0,0,0,0,0,0,0,0,0}; //array que representa as peças, cada posição representa uma peça.
+int tipo_copy[9] = {0,0,0,0,0,0,0,0,0}; //copia completa do array 'tipo', necessário visto da moda que implementamos o jogo 2.
 int sequencia = 0, indicador_l = 0, indicador_c = 0, incrementa = 0;
 int peca, conta_pecas;
 char table[1][15][24] = {{{' '}}};
@@ -54,7 +56,7 @@ char pecas[43][3][3] = { //array que representa todas as posições possiveis da
     {{'8','8','8'}, {'8','-','8'}, {'8','8','8'}},
     {{'-','-','-'}, {'-','-','-'}, {'-','-','-'}},
 };
-
+//ASD
 /**
  *  Nome: printBoard
  *  Objetivo: representar no ecrã valores previamente carregados no tabuleiro dedicado ao correto modo de jogo
@@ -70,15 +72,14 @@ void printBoard(modo_pecas, jogo, tempo_jogo) {
     //display da matriz na consola + column of numbers
     int num = row;
 
-    // Tipos de peça no modo p1
-    if (modo_pecas == 1 && jogo == 0) {
+    printf("\n");
+    if(modo_pecas == 1) {
         printf("\n %ix%i", row, column);
         for(i1=1; i1<9; i1++) {
-            printf(" - %i", tipo[i1]);
+            printf(" %i", tipo[i1]);
         }
-        printf("\n\n");
     }
-
+//asdsad
     // modo de jogo j0, j1 ou j2
     if(jogo == 1 || jogo == 2)
         modo=1;
@@ -381,6 +382,10 @@ void modo_pos(int modo_pecas) {
     if(modo_pecas == 2)
         escolha_pecas();
 
+    for (for1=1; for1<10; for1++) {
+        tipo_copy[for1] = tipo[for1];
+    }
+
     //Percorre a matriz em blocos 3x3
     for(for1=0; for1 < row/3; for1++) {
         for(for2=0; for2 < column/3; for2++) {
@@ -442,6 +447,7 @@ int disparo_j1(disparo_linha, disparo_coluna, disparos) {
                 return 1;
         }
     }
+    //printf("%i", conta_pecas);
     if (disparos == 2 || disparos == 3) {
         if (table[1][disparo_linha - 2][disparo_coluna - 17] != '-') {
             conta_pecas --;
@@ -473,7 +479,7 @@ int modo_j1(disparos, jogo) {
             printf("\n\n\t- Insira as coordenadas de disparo (coluna-linha): ");
             scanf(" %c %i", &disparo_coluna, &disparo_linha);
             printf("\n");
-        }while((disparo_coluna < 'A' || disparo_coluna > ('A' + column)) || (disparo_linha < 1 || disparo_linha > row)); 
+        }while((disparo_coluna < 'A' || disparo_coluna > ('A' + column)) || (disparo_linha < 1 || disparo_linha > row));
     }
     else if (jogo == 2) { //Modo de jogo 2
         if (disparos == 1) { //Modo d1
@@ -617,21 +623,6 @@ int modo_j1(disparos, jogo) {
             disparo_linha = ordem[sequencia-insurance][0][0] + (indicador_l*3);
             disparo_coluna = ordem[sequencia-insurance][1][0] + (indicador_c*3) + 'A';
             sequencia++; // passa para o proximo quadrado da sequencia pre-definida
-            usleep(90000);
-
-            if (table[0][disparo_linha - 2][disparo_coluna - 17] != '-') {
-                char sinal = table[0][disparo_linha - 2][disparo_coluna - 17];
-                incrementa++;
-                if(incrementa == (sinal - '0')) {
-                    incrementa = 0;
-                    sequencia = 0;
-                    if(indicador_c > (column/3 - 2)) {
-                        indicador_c = 0; // volta para as primeiras 3 colunas
-                        indicador_l ++; } // desce para as proximas 3 linhas
-                    else {
-                        indicador_c ++; } // passa para as proximas 3 colunas
-                }
-            }
         }
     }
     //se o utilizador inserir uma coordenada já jogada, conta_pecas não é afetado com a próxima função
@@ -642,7 +633,12 @@ int modo_j1(disparos, jogo) {
                 conta_pecas++;
             }
         }
-        table[1][row - disparo_linha - 2][disparo_coluna - 17] = table[0][row - disparo_linha - 2][disparo_coluna - 17];
+        printf("%c%i\n%c", disparo_coluna, row-disparo_linha, table[1][row - disparo_linha - 2][disparo_coluna - 17]);
+        scanf(" %c", &table[1][row - disparo_linha - 2][disparo_coluna - 17]);
+        if('-' != table[1][row - disparo_linha - 2][disparo_coluna - 17]) {
+            printf("\nCaracter inválido.");
+            exit(-1);
+        }
     }
     if (disparos == 2 || disparos == 3) {
         if (table[1][disparo_linha - 2][disparo_coluna - 17] != ' ') {
@@ -650,8 +646,28 @@ int modo_j1(disparos, jogo) {
                 conta_pecas++;
             }
         }
-        table[1][disparo_linha - 2][disparo_coluna - 17] = table[0][disparo_linha - 2][disparo_coluna - 17];
+        printf("%c%i\n%c", disparo_coluna, row-disparo_linha, table[1][disparo_linha - 2][disparo_coluna - 17]);
+        scanf(" %c", &table[1][disparo_linha - 2][disparo_coluna - 17]);
+        if('-' != table[1][disparo_linha - 2][disparo_coluna - 17]) {
+            printf("\nCaracter inválido.");
+            exit(-1);
+        }
+
+        if (table[1][disparo_linha - 2][disparo_coluna - 17] != '-') {
+            char sinal = table[1][disparo_linha - 2][disparo_coluna - 17];
+            incrementa++;
+            if(incrementa == (sinal - '0')) {
+                incrementa = 0;
+                sequencia = 0;
+                if(indicador_c > (column/3 - 2)) {
+                    indicador_c = 0; // volta para as primeiras 3 colunas
+                    indicador_l ++; } // desce para as proximas 3 linhas
+                else {
+                    indicador_c ++; } // passa para as proximas 3 colunas
+            }
+        }
     }
+
     //condição de vitória
     vitoria = disparo_j1(disparo_linha, disparo_coluna, disparos);
     return vitoria;
@@ -666,25 +682,38 @@ int modo_j1(disparos, jogo) {
  */
 
 int modo_jogo(modo_pecas, jogo, disparos) {
+    if(jogo == 0)
+        printBoard(modo_pecas, jogo);
     if(jogo == 1 || jogo == 2) {
         int i1, i2, vitoria, jogadas = 0;
-        //Inicializar o tabuleiro de jogo j1 a ' '
+        // Inicializar o tabuleiro de jogo j1 a ' '
         for(i1 = 0; i1 < row; i1++) {
             for (i2 = 0; i2 < column; i2++) {
                 table[1][i1][i2] = ' ';
             }
         }
+
+        if(jogo == 1)
+            printf("* ================================\n* Modo de Jogo 1\n* Insira as Coordenadas de Disparo\n* ================================\n");
+
+        if(jogo == 2)
+            printf("* ================================\n* Modo de Jogo 2\n* Crie um tabuleiro com as características indicadas\n* Responda aos disparos do programa\n* ================================\n");
+
+        // Mostra numero de pecas e tamanho do tabuleiro para ambos os modos
+        printf("%ix%i", row, column);
+        for(i1=1; i1<9; i1++) {
+                printf(" %i", tipo_copy[i1]);
+            }
+        printf("\n");
+
         time_t comeco = time(NULL);
         do {
             vitoria = modo_j1(disparos, jogo);
             jogadas++;
             if (vitoria == 0)
-                system("clear");
-                printBoard(modo_pecas, jogo);
                 printf("\n");
         }while(vitoria == 0);
 
-        system("clear");
         printBoard(modo_pecas, jogo);
 
         time_t fim = time(NULL);
@@ -753,6 +782,9 @@ int main(int argc, char *argv[]) {
                 break;
             case 'p':
                 sscanf(optarg, "%d", &modo_pecas);
+                if(jogo == 2 && modo_pecas == 1) {
+                    exit(-1);
+                }
                 break;
             case 'd':
                 sscanf(optarg, "%d", &disparos);
@@ -792,8 +824,9 @@ int main(int argc, char *argv[]) {
     }
     tipo[0] = (row*column)/9-tipo[1]-tipo[2]-tipo[3]-tipo[4]-tipo[5]-tipo[6]-tipo[7]-tipo[8];
     modo_pos(modo_pecas);
-    if((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0)) //restrição dos tamanhos do tabuleiro
-        exit(-1);
+    if((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0)) { //restrição dos tamanhos do tabuleiro
+        printf("Tabuleiro Inválido\n");
+        exit(-1); }
     // calcula número de células ocupadas por números na matriz
     for(i1=1; i1<=9; i1++) {
         conta_pecas += tipo[i1]*i1;
@@ -801,4 +834,3 @@ int main(int argc, char *argv[]) {
     modo_jogo(modo_pecas, jogo, disparos);
     return EXIT_SUCCESS;
 }
-
