@@ -316,7 +316,7 @@ int rand_pecas(a, modo_pecas) {
 
 /**
  *  Nome: contador
- *  Objetivo: contar o número e o tipo de peças colocadas nos modos de posicionamento
+ *  Objetivo: Realizar a Restrição 3
  *
  *  Parametros de entrada: a
  *  Paremetros de saida: n/a
