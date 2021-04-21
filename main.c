@@ -81,6 +81,7 @@ void printBoard(int modo_pecas, int jogo) {
             printf(" %i", tipo[i1]);
         }
     }
+    printf("\n");
 
     // modo de jogo j0, j1 ou j2
     if(jogo == 1 || jogo == 2)
@@ -370,7 +371,7 @@ int contador(int a) {
  *  Paremetros de saida: n/a
  */
 
-void modo_pos(int modo_pecas) {
+void modo_pos(int modo_pecas, int jogo, int disparos) {
 
     /* for1 - percorre matriz global de 3 em 3 linhas.
        for2 - percorre matriz global de 3 em 3 colunas.
@@ -394,25 +395,34 @@ void modo_pos(int modo_pecas) {
         for(for2=0; for2 < column/3; for2++) {
 
             //Matriz 3x3 específica
-            do {
-                // Modo p1
-                if (modo_pecas == 1) {
-                    a = rand() % 43;
-                    contador1 = contador(a);
-                }
-                // Modo p2
-                if(modo_pecas == 2) {
-                    do {
-                        peca = rand()%9;
-                    }while(tipo[peca] == 0);
-                    a = rand_pecas(a, modo_pecas);
-                }
+            if ((jogo == 2) && (disparos != 1)){
                 for(for3=0; for3<3; for3++) {
                     for(for4=0; for4<3; for4++) {
-                        table[0][for3+for1*3][for4+for2*3] = pecas[a][for3][for4];
+                        table[0][for3+for1*3][for4+for2*3] = '-';
                     }
                 }
-            }while(restricao_1(for1, for2, modo_pecas, contador1));
+            }
+            else {
+                do {
+                    // Modo p1
+                    if (modo_pecas == 1) {
+                        a = rand() % 43;
+                        contador1 = contador(a);
+                    }
+                    // Modo p2
+                    if(modo_pecas == 2) {
+                        do {
+                            peca = rand()%9;
+                        }while(tipo[peca] == 0);
+                        a = rand_pecas(a, modo_pecas);
+                    }
+                    for(for3=0; for3<3; for3++) {
+                        for(for4=0; for4<3; for4++) {
+                            table[0][for3+for1*3][for4+for2*3] = pecas[a][for3][for4];
+                        }
+                    }
+                }while(restricao_1(for1, for2, modo_pecas, contador1));
+            }
         }
     }
 }
@@ -442,7 +452,7 @@ char d1_coluna() {
  *  Paremetros de saida: n/a
  */
 
-int disparo_j1(int disparo_linha, int disparo_coluna, int disparos) {
+int disparo_j1(int disparo_linha, char disparo_coluna, int disparos) {
     if (disparos == 1) {
         if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-') {
             conta_pecas --;
@@ -450,10 +460,10 @@ int disparo_j1(int disparo_linha, int disparo_coluna, int disparos) {
                 return 1;
         }
     }
-    printf("%i", conta_pecas);
-    if (disparos == 2 || disparos == 3) {
+    if (disparos != 1) {
         if (table[1][disparo_linha - 2][disparo_coluna - 17] != '-') {
             conta_pecas --;
+            printf("%i", conta_pecas);
             if (conta_pecas == 0)
                 return 1;
         }
@@ -491,7 +501,7 @@ int modo_j1(int disparos, int jogo) {
                 disparo_coluna = d1_coluna();
             }while(table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ');
         }
-        else if (disparos == 2 || disparos == 3) { //Modo d2 e d3 (d3 é uma evolução do modo d2)
+        else if (disparos != 1) { //Modo d2 e d3 (d3 é uma evolução do modo d2)
             if(sequencia >= 9) {
                 sequencia = 0; // reset do ciclo
                 if(indicador_c > (column/3 - 2)) {
@@ -503,122 +513,6 @@ int modo_j1(int disparos, int jogo) {
             disparo_linha = ordem[sequencia][0][0] + (indicador_l*3);
             disparo_coluna = ordem[sequencia][1][0] + (indicador_c*3) + 'A';
 
-            if ((disparos == 3) && (table[0][disparo_linha - 2][disparo_coluna - 17] == '-')) {
-                //  PRIMEIRAS 3 LINHAS 3,5,8
-                if((indicador_l==0) && (indicador_c>0)) {
-                    switch(sequencia) {
-                case 3: case 8:
-                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
-                        sequencia++;
-                        break; }
-                    break;
-                case 5:
-                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
-                        sequencia++;
-                        break; }
-                    break;
-                default:
-                    break;
-                    }
-                }
-                // PRIMEIRAS 3 COLUNAS 1,5,7
-                else if((indicador_l>0) && (indicador_c == 0)) {
-                    switch(sequencia) {
-                case 1: case 7:
-                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Cima & Esquerda
-                        sequencia++;
-                        break; }
-                    break;
-                case 5:
-                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
-                        sequencia++;
-                        break; }
-                    break;
-                default:
-                    break;
-                    }
-                }
-                // RESTO DO TABULEIRO 1,3,4,7,8
-                else if((indicador_l>0) && indicador_c>0) {
-                    switch(sequencia) {
-                case 3:
-                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
-                        sequencia++;
-                        break; }
-                    break;
-                case 5:
-                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
-                        sequencia++;
-                        break; }
-                    break;
-                case 1:
-                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
-                        sequencia++;
-                        break; }
-                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Cima & Esquerda
-                        sequencia++;
-                        break; }
-                    break;
-                case 7:
-                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
-                        sequencia++;
-                        break; } // CUIDADO
-                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Cima & Esquerda
-                        sequencia++;
-                        break;
-                case 8:
-                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
-                        sequencia++;
-                        break;}
-                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
-                        sequencia++;
-                        break; }
-                    break;
-                default:
-                    break;
-                    }
-                }
-            }
-
             if (sequencia == 9)
                 insurance = 8;
 
@@ -627,32 +521,39 @@ int modo_j1(int disparos, int jogo) {
             sequencia++; // passa para o proximo quadrado da sequencia pre-definida
         }
     }
-    //se o utilizador inserir uma coordenada já jogada, conta_pecas não é afetado com a próxima função
 
+    //se o utilizador inserir uma coordenada já jogada, conta_pecas não é afetado com a próxima função
     if (disparos == 1 || jogo == 1) {
         if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ') {
             if(table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-'){
                 conta_pecas++;
             }
         }
-        printf("%c%i\n%c", disparo_coluna, row-disparo_linha, table[1][row - disparo_linha - 2][disparo_coluna - 17]);
+        printf("%c%i\n", disparo_coluna, disparo_linha);
         scanf(" %c", &table[1][row - disparo_linha - 2][disparo_coluna - 17]);
-        if('-' != table[1][row - disparo_linha - 2][disparo_coluna - 17]) {
-            printf("\n*Caracter inválido.");
-            exit(-1);
+        if((table[1][row - disparo_linha - 2][disparo_coluna - 17] >= 49) && (table[1][row - disparo_linha - 2][disparo_coluna - 17] <= 56)) {
+            if('-' == table[1][row - disparo_linha - 2][disparo_coluna - 17]) {
+                printf("\n*Caracter inválido.");
+                exit(-1);
+            }
         }
     }
+
     if (disparos == 2 || disparos == 3) {
+        printf("%c%i\n", disparo_coluna, row-disparo_linha);
+        scanf(" %c", &table[1][disparo_linha - 2][disparo_coluna - 17]);
+        table[1][disparo_linha - 2][disparo_coluna - 17] = table[0][disparo_linha - 2][disparo_coluna - 17];
+        if((table[1][row - disparo_linha - 2][disparo_coluna - 17] >= 49) && (table[1][row - disparo_linha - 2][disparo_coluna - 17] <= 56)) {
+            if('-' == table[1][disparo_linha - 2][disparo_coluna - 17]) {
+                printf("\n*Caracter inválido.");
+                exit(-1);
+            }
+        }
+
         if (table[1][disparo_linha - 2][disparo_coluna - 17] != ' ') {
             if(table[1][disparo_linha - 2][disparo_coluna - 17] != '-'){
                 conta_pecas++;
             }
-        }
-        printf("%c%i\n%c", disparo_coluna, row-disparo_linha, table[1][disparo_linha - 2][disparo_coluna - 17]);
-        scanf(" %c", &table[1][disparo_linha - 2][disparo_coluna - 17]);
-        if('-' != table[1][disparo_linha - 2][disparo_coluna - 17]) {
-            printf("\nCaracter inválido.");
-            exit(-1);
         }
 
         if (table[1][disparo_linha - 2][disparo_coluna - 17] != '-') {
@@ -668,8 +569,123 @@ int modo_j1(int disparos, int jogo) {
                     indicador_c ++; } // passa para as proximas 3 colunas
             }
         }
-    }
 
+        if ((disparos == 3) && (table[0][disparo_linha - 2][disparo_coluna - 17] == '-')) {
+            //  PRIMEIRAS 3 LINHAS 3,5,8
+            if((indicador_l==0) && (indicador_c>0)) {
+                switch(sequencia) {
+            case 3: case 8:
+                if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
+                    sequencia++;
+                    break; }
+                break;
+            case 5:
+                if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
+                    sequencia++;
+                    break; }
+                break;
+            default:
+                break;
+                }
+            }
+            // PRIMEIRAS 3 COLUNAS 1,5,7
+            else if((indicador_l>0) && (indicador_c == 0)) {
+                switch(sequencia) {
+            case 1: case 7:
+                if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Cima & Esquerda
+                    sequencia++;
+                    break; }
+                break;
+            case 5:
+                if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
+                    sequencia++;
+                    break; }
+                break;
+            default:
+                break;
+                }
+            }
+            // RESTO DO TABULEIRO 1,3,4,7,8
+            else if((indicador_l>0) && indicador_c>0) {
+                switch(sequencia) {
+            case 3:
+                if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
+                    sequencia++;
+                    break; }
+                break;
+            case 5:
+                if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
+                    sequencia++;
+                    break; }
+                break;
+            case 1:
+                if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
+                    sequencia++;
+                    break; }
+                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Cima & Esquerda
+                    sequencia++;
+                    break; }
+                break;
+            case 7:
+                if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
+                    sequencia++;
+                    break; } // CUIDADO
+                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Cima & Esquerda
+                    sequencia++;
+                    break;
+            case 8:
+                if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
+                    sequencia++;
+                    break;}
+                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
+                    sequencia++;
+                    break; }
+                break;
+            default:
+                break;
+                }
+            }
+        }
+    }
     //condição de vitória
     vitoria = disparo_j1(disparo_linha, disparo_coluna, disparos);
     return vitoria;
@@ -694,6 +710,7 @@ int modo_jogo(int modo_pecas, int jogo, int disparos) {
                 table[1][i1][i2] = ' ';
             }
         }
+
 
         if(jogo == 1)
             printf("* ================================\n* Modo de Jogo 1\n* Insira as Coordenadas de Disparo\n* ================================\n");
@@ -823,15 +840,15 @@ int main(int argc, char *argv[]) {
         conta_pecas += tipo[i1]*i1;
     }
     tipo[0] = (row*column)/9-tipo[1]-tipo[2]-tipo[3]-tipo[4]-tipo[5]-tipo[6]-tipo[7]-tipo[8];
-    modo_pos(modo_pecas);
+    modo_pos(modo_pecas, jogo, disparos);
     if((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0)) { //restrição dos tamanhos do tabuleiro
         printf("*Tabuleiro Inválido\n");
         menu_ajuda();
         exit(-1); }
     // calcula número de células ocupadas por números na matriz
-    for(i1=1; i1<=9; i1++) {
-        conta_pecas += tipo[i1]*i1;
-    }
+    //for(i1=1; i1<=9; i1++) {
+    //    conta_pecas += tipo[i1]*i1;
+    //}
     modo_jogo(modo_pecas, jogo, disparos);
     return EXIT_SUCCESS;
 }
