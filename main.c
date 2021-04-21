@@ -79,7 +79,7 @@ void printBoard(modo_pecas, jogo, tempo_jogo) {
             printf(" %i", tipo[i1]);
         }
     }
-//asdsad
+
     // modo de jogo j0, j1 ou j2
     if(jogo == 1 || jogo == 2)
         modo=1;
