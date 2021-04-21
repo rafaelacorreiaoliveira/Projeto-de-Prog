@@ -250,11 +250,10 @@ int restricao_1(int for1, int for2, int modo_pecas, int contador1) {
  */
 
 void escolha_pecas() {
-
     int i1, soma=0;
     for(i1=1; i1<9; i1++) {
         // Restrição 4
-        if(soma > (row*column/18)) {
+        if(soma >= (row*column/18)) {
             soma = 0;
             printf("*Número de peças inválido.\n");
             menu_ajuda();
