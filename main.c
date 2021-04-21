@@ -56,7 +56,7 @@ char pecas[43][3][3] = { //array que representa todas as posições possiveis da
     {{'8','8','8'}, {'8','-','8'}, {'8','8','8'}},
     {{'-','-','-'}, {'-','-','-'}, {'-','-','-'}},
 };
-//ASD
+
 /**
  *  Nome: printBoard
  *  Objetivo: representar no ecrã valores previamente carregados no tabuleiro dedicado ao correto modo de jogo
