@@ -446,7 +446,7 @@ int disparo_j1(disparo_linha, disparo_coluna, disparos) {
                 return 1;
         }
     }
-    //printf("%i", conta_pecas);
+    printf("%i", conta_pecas);
     if (disparos == 2 || disparos == 3) {
         if (table[1][disparo_linha - 2][disparo_coluna - 17] != '-') {
             conta_pecas --;
