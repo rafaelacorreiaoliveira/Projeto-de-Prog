@@ -253,7 +253,7 @@ void escolha_pecas() {
         // Restrição 4
         if(soma > (row*column/18)) {
             soma = 0;
-         printf("Número de peças inválido.\n");
+         printf("*Número de peças inválido.\n");
             exit(-1);
         }
         soma += tipo[i1];
@@ -262,7 +262,7 @@ void escolha_pecas() {
     for(i1=1; i1<8; i1++) {
         if(tipo[i1] < tipo[i1+1]) {
             soma = 0;
-        printf("Número de peças inválido.\n");
+        printf("*Número de peças inválido.\n");
         exit(-1);
         }
     }
@@ -276,7 +276,6 @@ void escolha_pecas() {
  *  Parametros de entrada: a, modo_pecas
  *  Paremetros de saida: a
  */
-
 
 int rand_pecas(a, modo_pecas) {
 
@@ -476,7 +475,7 @@ int modo_j1(disparos, jogo) {
 
     if(jogo == 1) { //Modo de jogo 1
         do {
-            printf("\n\n\t- Insira as coordenadas de disparo (coluna-linha): ");
+            //printf("\n\n\tInsira as coordenadas de disparo (coluna-linha): ");
             scanf(" %c %i", &disparo_coluna, &disparo_linha);
             printf("\n");
         }while((disparo_coluna < 'A' || disparo_coluna > ('A' + column)) || (disparo_linha < 1 || disparo_linha > row));
@@ -636,7 +635,7 @@ int modo_j1(disparos, jogo) {
         printf("%c%i\n%c", disparo_coluna, row-disparo_linha, table[1][row - disparo_linha - 2][disparo_coluna - 17]);
         scanf(" %c", &table[1][row - disparo_linha - 2][disparo_coluna - 17]);
         if('-' != table[1][row - disparo_linha - 2][disparo_coluna - 17]) {
-            printf("\nCaracter inválido.");
+            printf("\n*Caracter inválido.");
             exit(-1);
         }
     }
@@ -738,19 +737,19 @@ void menu_ajuda(char *program){
     printf("Jogo da Batalha Naval.\n\n");
     printf("Opções de funcionamento: \n");
     printf("-h\t ajuda ao utilizador, mostra as instruções.\n");
-    printf("-t\t dimensões do tabuleiro (linha x coluna).");
+    printf("-t\t dimensões do tabuleiro (linha x coluna).\n");
     printf("-j\t modos de jogo.");
-    printf("-p\t modo de posicionamento de paças pelo computador (1 a 2)");
-    printf("-d\t modos de disparo de peças pelo computador (1 a 3)");
-    printf("-1\t número de peças do tipo 1");
-    printf("-2\t número de peças do tipo 2");
-    printf("-3\t número de peças do tipo 3");
-    printf("-4\t número de peças do tipo 3");
-    printf("-4\t número de peças do tipo 4");
-    printf("-5\t número de peças do tipo 5");
-    printf("-6\t número de peças do tipo 6");
-    printf("-7\t número de peças do tipo 7");
-    printf("-8\t número de peças do tipo 8");
+    printf("-p\t modo de posicionamento de paças pelo computador (1 a 2)\n");
+    printf("-d\t modos de disparo de peças pelo computador (1 a 3)\n");
+    printf("-1\t número de peças do tipo 1\n");
+    printf("-2\t número de peças do tipo 2\n");
+    printf("-3\t número de peças do tipo 3\n");
+    printf("-4\t número de peças do tipo 3\n");
+    printf("-4\t número de peças do tipo 4\n");
+    printf("-5\t número de peças do tipo 5\n");
+    printf("-6\t número de peças do tipo 6\n");
+    printf("-7\t número de peças do tipo 7\n");
+    printf("-8\t número de peças do tipo 8\n");
     printf("Exemplos de programas que podem ser efetuados:\n");
     printf("-j 1 -p 1\n");
     printf("-j 2 -p 1 -d 3\n");
@@ -825,7 +824,7 @@ int main(int argc, char *argv[]) {
     tipo[0] = (row*column)/9-tipo[1]-tipo[2]-tipo[3]-tipo[4]-tipo[5]-tipo[6]-tipo[7]-tipo[8];
     modo_pos(modo_pecas);
     if((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0)) { //restrição dos tamanhos do tabuleiro
-        printf("Tabuleiro Inválido\n");
+        printf("*Tabuleiro Inválido\n");
         exit(-1); }
     // calcula número de células ocupadas por números na matriz
     for(i1=1; i1<=9; i1++) {
