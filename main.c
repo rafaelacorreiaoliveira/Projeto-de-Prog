@@ -728,8 +728,7 @@ int modo_jogo(modo_pecas, jogo, disparos) {
  *  Nome: menu_ajuda
  *  Objetivo: ajuda ao utilizador, diz ao utilizador os argumentos que deve utilizar para conseguir correr o programa
  *
- *  Parametros de entrada: program
- *  Paremetros de saida: n/a
+ *Não tem parâmetros de entrada nem de saida
  */
 
 void menu_ajuda(char *program){
