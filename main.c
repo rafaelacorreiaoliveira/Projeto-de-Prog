@@ -57,15 +57,17 @@ char pecas[43][3][3] = { //array que representa todas as posições possiveis da
     {{'-','-','-'}, {'-','-','-'}, {'-','-','-'}},
 };
 
+void menu_ajuda();
+//asdasd
 /**
  *  Nome: printBoard
  *  Objetivo: representar no ecrã valores previamente carregados no tabuleiro dedicado ao correto modo de jogo
  *
- *  Parametros de entrada: modo_pecas, jogo, tempo_jogo
+ *  Parametros de entrada: modo_pecas, jogo
  *  Parametros de saida: n/a
  */
 
-void printBoard(modo_pecas, jogo, tempo_jogo) {
+void printBoard(int modo_pecas, int jogo) {
     int i1, i2, modo=0;
     char letters[] = "ABCDEFGHIJKLMNOQPRSTUVWX";
 
@@ -111,7 +113,7 @@ void printBoard(modo_pecas, jogo, tempo_jogo) {
  *  Paremetros de saida: n/a
  */
 
-int restricao_1(for1, for2, modo_pecas, contador1) {
+int restricao_1(int for1, int for2, int modo_pecas, int contador1) {
 
     int i1, flag = 0;
     char check1, check2, check3, check4;
@@ -253,7 +255,8 @@ void escolha_pecas() {
         // Restrição 4
         if(soma > (row*column/18)) {
             soma = 0;
-         printf("*Número de peças inválido.\n");
+            printf("*Número de peças inválido.\n");
+            menu_ajuda();
             exit(-1);
         }
         soma += tipo[i1];
@@ -262,8 +265,9 @@ void escolha_pecas() {
     for(i1=1; i1<8; i1++) {
         if(tipo[i1] < tipo[i1+1]) {
             soma = 0;
-        printf("*Número de peças inválido.\n");
-        exit(-1);
+            printf("*Número de peças inválido.\n");
+            menu_ajuda();
+            exit(-1);
         }
     }
     system("clear");
@@ -277,7 +281,7 @@ void escolha_pecas() {
  *  Paremetros de saida: a
  */
 
-int rand_pecas(a, modo_pecas) {
+int rand_pecas(int a, int modo_pecas) {
 
     switch(peca) {
         case 0:
@@ -322,7 +326,7 @@ int rand_pecas(a, modo_pecas) {
  *  Paremetros de saida: n/a
  */
 
-int contador(a) {
+int contador(int a) {
     if(a <= 8) {
         tipo[1]++;
         return 1;
@@ -373,7 +377,7 @@ void modo_pos(int modo_pecas) {
        for3 - percorre natriz específica 3x3 por linhas.
        for4 - percorre matriz específica 3x3 por colunas. */
     int for1, for2, for3, for4;
-    int a, contador1;
+    int a=0, contador1=0;
     time_t t;
     srand((unsigned) time(&t));
 
@@ -438,7 +442,7 @@ char d1_coluna() {
  *  Paremetros de saida: n/a
  */
 
-int disparo_j1(disparo_linha, disparo_coluna, disparos) {
+int disparo_j1(int disparo_linha, int disparo_coluna, int disparos) {
     if (disparos == 1) {
         if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-') {
             conta_pecas --;
@@ -465,7 +469,7 @@ int disparo_j1(disparo_linha, disparo_coluna, disparos) {
  *  Paremetros de saida: vitória
  */
 
-int modo_j1(disparos, jogo) {
+int modo_j1(int disparos, int jogo) {
     //ordem dos disparos (centro, cima, baixo, esquerda, direita e cantos)
     int ordem[9][2][1] = {{{1}, {1}}, {{0}, {1}}, {{2}, {1}}, {{1}, {0}}, {{1}, {2}}, {{0}, {0}}, {{2}, {2}}, {{0}, {2}}, {{2}, {0}}};
     int disparo_linha = 0, vitoria=0, insurance=0;
@@ -485,7 +489,6 @@ int modo_j1(disparos, jogo) {
             do {
                 disparo_linha = d1_linha();
                 disparo_coluna = d1_coluna();
-                usleep(800);
             }while(table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ');
         }
         else if (disparos == 2 || disparos == 3) { //Modo d2 e d3 (d3 é uma evolução do modo d2)
@@ -680,7 +683,7 @@ int modo_j1(disparos, jogo) {
  *  Paremetros de saida: n/a
  */
 
-int modo_jogo(modo_pecas, jogo, disparos) {
+int modo_jogo(int modo_pecas, int jogo, int disparos) {
     if(jogo == 0)
         printBoard(modo_pecas, jogo);
     if(jogo == 1 || jogo == 2) {
@@ -731,13 +734,12 @@ int modo_jogo(modo_pecas, jogo, disparos) {
  *Não tem parâmetros de entrada nem de saida
  */
 
-void menu_ajuda(char *program){
-
+void menu_ajuda() {
     printf("Jogo da Batalha Naval.\n\n");
     printf("Opções de funcionamento: \n");
     printf("-h\t ajuda ao utilizador, mostra as instruções.\n");
     printf("-t\t dimensões do tabuleiro (linha x coluna).\n");
-    printf("-j\t modos de jogo.");
+    printf("-j\t modos de jogo.\n");
     printf("-p\t modo de posicionamento de paças pelo computador (1 a 2)\n");
     printf("-d\t modos de disparo de peças pelo computador (1 a 3)\n");
     printf("-1\t número de peças do tipo 1\n");
@@ -764,7 +766,6 @@ void menu_ajuda(char *program){
 
 int main(int argc, char *argv[]) {
     int modo_pecas,jogo,disparos,i1;
-    int row=9, column=9;
     int opt = 'h';
     opterr = 0;
     while((opt=getopt(argc, argv, "t:j:p:d:1:2:3:4:5:6:7:8:h")) != -1){
@@ -825,6 +826,7 @@ int main(int argc, char *argv[]) {
     modo_pos(modo_pecas);
     if((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0)) { //restrição dos tamanhos do tabuleiro
         printf("*Tabuleiro Inválido\n");
+        menu_ajuda();
         exit(-1); }
     // calcula número de células ocupadas por números na matriz
     for(i1=1; i1<=9; i1++) {
