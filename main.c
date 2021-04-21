@@ -765,6 +765,7 @@ void menu_ajuda(char *program){
 
 int main(int argc, char *argv[]) {
     int modo_pecas,jogo,disparos,i1;
+    int row=9, column=9;
     int opt = 'h';
     opterr = 0;
     while((opt=getopt(argc, argv, "t:j:p:d:1:2:3:4:5:6:7:8:h")) != -1){
