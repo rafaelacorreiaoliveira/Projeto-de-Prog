@@ -7,9 +7,11 @@
 //VARIÁVEIS GLOBAIS, variáveis essenciais chamadas várias vezes ao longo do programa.
 int row=9, column=9; //variáveis que representam o tamanho do tabuleiro, valor inicial igual a 9 devido à dimensão mínima do tabuleiro.
 int tipo[9] = {0,0,0,0,0,0,0,0,0}; //array que representa as peças, cada posição representa uma peça.
-int tipo_copy[9] = {0,0,0,0,0,0,0,0,0}; //copia completa do array 'tipo', necessário visto da moda que implementamos o jogo 2.
+int tipo_copy[9] = {0,0,0,0,0,0,0,0,0}; //copia completa do array 'tipo', necessário visto da moda que implementamos certos modos.
+// sequencia representa a ordem dos disparos; indicador_l e indicador_c apontam para a linha e coluna do tabuleiro no modo j2; incrementa ajuda na implementação da restrição no modo jogo 2 (disparo 2 e 3)
 int sequencia = 0, indicador_l = 0, indicador_c = 0, incrementa = 0;
-int peca, conta_pecas;
+// peca indica o tipo peça (no vetor tipo); conta_pecas guarda o número de carácteres não nulos (' ' ou '-') de uma matriz.
+int peca = 0, conta_pecas = 0;
 char table[1][15][24] = {{{' '}}};
 char pecas[43][3][3] = { //array que representa todas as posições possiveis das peças
     {{'1','-','-'}, {'-','-','-'}, {'-','-','-'}},
@@ -58,13 +60,10 @@ char pecas[43][3][3] = { //array que representa todas as posições possiveis da
 };
 
 void menu_ajuda();
-//asdasd
+
 /**
  *  Nome: printBoard
  *  Objetivo: representar no ecrã valores previamente carregados no tabuleiro dedicado ao correto modo de jogo
- *
- *  Parametros de entrada: modo_pecas, jogo
- *  Parametros de saida: n/a
  */
 
 void printBoard(int modo_pecas, int jogo) {
@@ -74,14 +73,12 @@ void printBoard(int modo_pecas, int jogo) {
     //display da matriz na consola + column of numbers
     int num = row;
 
-    printf("\n");
-    if(modo_pecas == 1) {
-        printf("\n %ix%i", row, column);
-        for(i1=1; i1<9; i1++) {
-            printf(" %i", tipo[i1]);
-        }
+    printf("\n %ix%i", row, column);
+    for(i1=1; i1<9; i1++) {
+        printf(" %i", tipo[i1]);
     }
-    printf("\n");
+
+    printf("\n\n");
 
     // modo de jogo j0, j1 ou j2
     if(jogo == 1 || jogo == 2)
@@ -109,9 +106,6 @@ void printBoard(int modo_pecas, int jogo) {
 /**
  *  Nome: restricao_1
  *  Objetivo: implementar a restrição 1 relativamente á disposição das peças
- *
- *  Parametros de entrada: for1, for2, modo_pecas, contador1
- *  Paremetros de saida: n/a
  */
 
 int restricao_1(int for1, int for2, int modo_pecas, int contador1) {
@@ -236,53 +230,18 @@ int restricao_1(int for1, int for2, int modo_pecas, int contador1) {
 
     // caso a peça nao seja colocável, no modo de posicionamento 2, volta a adicionar o valor da peça no array
     if (flag == 1 && modo_pecas == 2)
-        tipo[peca]++;
+        tipo_copy[peca]++;
 
     return flag;
 }
 
 /**
- *  Nome: escolha_pecas
- *  Objetivo: obter a partir do utilizador as peças a introduzir no tabuleiro
- *
- *  Parametros de entrada: n/a
- *  Paremetros de saida: n/a
- */
-
-void escolha_pecas() {
-    int i1, soma=0;
-    for(i1=1; i1<9; i1++) {
-        // Restrição 4
-        if(soma >= (row*column/18)) {
-            soma = 0;
-            printf("*Número de peças inválido.\n");
-            menu_ajuda();
-            exit(-1);
-        }
-        soma += tipo[i1];
-    }
-    //Verifica se alguma peça de tipo superior têm mais repetições que a anterior
-    for(i1=1; i1<8; i1++) {
-        if(tipo[i1] < tipo[i1+1]) {
-            soma = 0;
-            printf("*Número de peças inválido.\n");
-            menu_ajuda();
-            exit(-1);
-        }
-    }
-    system("clear");
-}
-
-/**
  *  Nome: rand_pecas
  *  Objetivo: randomização da variante de uma peça, utilizada no modo de posicionamento 2
- *
- *  Parametros de entrada: a, modo_pecas
- *  Paremetros de saida: a
  */
 
-int rand_pecas(int a, int modo_pecas) {
-
+int rand_pecas() {
+    int a = 0;
     switch(peca) {
         case 0:
             a = 42;
@@ -313,7 +272,7 @@ int rand_pecas(int a, int modo_pecas) {
             break; }
 
     // ao subtrarir do array, conta como se a peça fosse colocada
-    tipo[peca]--;
+    tipo_copy[peca]--;
 
     return a;
 }
@@ -321,9 +280,6 @@ int rand_pecas(int a, int modo_pecas) {
 /**
  *  Nome: contador
  *  Objetivo: Realizar a Restrição 3
- *
- *  Parametros de entrada: a
- *  Paremetros de saida: n/a
  */
 
 int contador(int a) {
@@ -364,37 +320,30 @@ int contador(int a) {
 
 /**
  *  Nome: modo_pos
- *  Objetivo: correr o programa de acordo com o modo selecionado
- *
- *  Parametros de entrada: modo_pecas
- *  Paremetros de saida: n/a
+ *  Objetivo: construir o tabuleiro '0' de acordo com o modo de posicionamento escolhido
  */
 
-void modo_pos(int modo_pecas, int jogo, int disparos) {
+int modo_pos(int modo_pecas, int jogo, int disparos, int repeticao) {
 
     /* for1 - percorre matriz global de 3 em 3 linhas.
        for2 - percorre matriz global de 3 em 3 colunas.
        for3 - percorre natriz específica 3x3 por linhas.
        for4 - percorre matriz específica 3x3 por colunas. */
     int for1, for2, for3, for4;
-    int a=0, contador1=0;
-    time_t t;
-    srand((unsigned) time(&t));
+    int a=0, contador1=0, repeticao2=0;
+    peca = 0;
 
-    // Modo p2
-    if(modo_pecas == 2)
-        escolha_pecas();
-
-    for (for1=1; for1<10; for1++) {
+    for (for1=0; for1<9; for1++) {
         tipo_copy[for1] = tipo[for1];
     }
 
     //Percorre a matriz em blocos 3x3
     for(for1=0; for1 < row/3; for1++) {
         for(for2=0; for2 < column/3; for2++) {
+            repeticao2=0;
 
-            //Matriz 3x3 específica
-            if ((jogo == 2) && (disparos != 1)){
+            //Matriz 3x3 específica (no caso de jogo 2 onde escolhemos o posicionamento, inicializamos a table 0 toda com '-')
+            if (jogo == 2) {
                 for(for3=0; for3<3; for3++) {
                     for(for4=0; for4<3; for4++) {
                         table[0][for3+for1*3][for4+for2*3] = '-';
@@ -403,35 +352,40 @@ void modo_pos(int modo_pecas, int jogo, int disparos) {
             }
             else {
                 do {
+                    repeticao2++;
                     // Modo p1
                     if (modo_pecas == 1) {
                         a = rand() % 43;
+                        if (repeticao2 % 3 == 0)
+                            a = 4; // se ao fim de 3 tentativas não conseguir colocar a peça gerada, cria uma peça 1 no meio da matriz 3x3
                         contador1 = contador(a);
                     }
                     // Modo p2
                     if(modo_pecas == 2) {
                         do {
-                            peca = rand()%9;
-                        }while(tipo[peca] == 0);
-                        a = rand_pecas(a, modo_pecas);
+                            peca = rand() % 9;
+                        }while(tipo_copy[peca] == 0);
+                        a = rand_pecas();
                     }
                     for(for3=0; for3<3; for3++) {
                         for(for4=0; for4<3; for4++) {
                             table[0][for3+for1*3][for4+for2*3] = pecas[a][for3][for4];
                         }
                     }
+                    if (repeticao2 == 8) {
+                        tipo_copy[peca]++;
+                        return -1;
+                    }
                 }while(restricao_1(for1, for2, modo_pecas, contador1));
             }
         }
     }
+    return 0;
 }
 
 /**
  *  Nome: d1_linha e d1_coluna
  *  Objetivo: implementar o modo de disparo 1 do computador (dispara em função das colunas e das linhas)
- *
- *  Parametros de entrada: n/a
- *  Paremetros de saida: linha, coluna
  */
 
 int d1_linha() {
@@ -446,23 +400,21 @@ char d1_coluna() {
 /**
  *  Nome: disparo_j1
  *  Objetivo: verificar condição de vitória
- *
- *  Parametros de entrada: disparo_linha, disparo_coluna, disparos
- *  Paremetros de saida: n/a
  */
 
-int disparo_j1(int disparo_linha, char disparo_coluna, int disparos) {
-    if (disparos == 1) {
+int disparo_j1(int disparo_linha, char disparo_coluna, int disparos, int jogo) {
+    if (disparos == 1 || jogo == 1) {
         if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-') {
+            printf("BRUH");
             conta_pecas --;
             if (conta_pecas == 0)
                 return 1;
         }
     }
-    if (disparos != 1) {
+
+    if (disparos == 2 || disparos == 3) {
         if (table[1][disparo_linha - 2][disparo_coluna - 17] != '-') {
             conta_pecas --;
-            printf("%i", conta_pecas);
             if (conta_pecas == 0)
                 return 1;
         }
@@ -472,35 +424,48 @@ int disparo_j1(int disparo_linha, char disparo_coluna, int disparos) {
 
  /**
  *  Nome: modo_j1
- *  Objetivo: implementar o modo de jogo 1 e 2 (todos os modos de disparo incluidos)
- *
- *  Parametros de entrada: disparos, jogo
- *  Paremetros de saida: vitória
+ *  Objetivo: implementar o modo de jogo 1 e 2 (todos os modos de disparo incluidos) com as suas devidas restrições
  */
 
 int modo_j1(int disparos, int jogo) {
     //ordem dos disparos (centro, cima, baixo, esquerda, direita e cantos)
     int ordem[9][2][1] = {{{1}, {1}}, {{0}, {1}}, {{2}, {1}}, {{1}, {0}}, {{1}, {2}}, {{0}, {0}}, {{2}, {2}}, {{0}, {2}}, {{2}, {0}}};
     int disparo_linha = 0, vitoria=0, insurance=0;
-    char disparo_coluna = {' '};
+    char disparo_coluna = '\0';
     time_t t;
     srand((unsigned) time(&t));
 
     if(jogo == 1) { //Modo de jogo 1
-        do {
-            //printf("\n\n\tInsira as coordenadas de disparo (coluna-linha): ");
-            scanf(" %c %i", &disparo_coluna, &disparo_linha);
-            printf("\n");
-        }while((disparo_coluna < 'A' || disparo_coluna > ('A' + column)) || (disparo_linha < 1 || disparo_linha > row));
+        scanf(" %c %i", &disparo_coluna, &disparo_linha);
+        if (disparo_coluna < 'A' || disparo_coluna > ('A' + column)) {
+            printf("*Coluna inválida");
+            exit(-1);
+        }
+        if (disparo_linha < 1 || disparo_linha > row) {
+            printf("*Linha inválida");
+            exit(-1);
+        }
+        table[1][row - disparo_linha - 2][disparo_coluna - 17] = table[0][row - disparo_linha - 2][disparo_coluna - 17];
+        printf("%c\n", table[1][row - disparo_linha - 2][disparo_coluna - 17]);
     }
+
     else if (jogo == 2) { //Modo de jogo 2
         if (disparos == 1) { //Modo d1
             do {
                 disparo_linha = d1_linha();
                 disparo_coluna = d1_coluna();
             }while(table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ');
+            printf("%c%i\n", disparo_coluna, disparo_linha); // Display de onde vai acertar
+            scanf(" %c", &table[1][row - disparo_linha - 2][disparo_coluna - 17]); // Scan da peça a colocar
+            // Casos em que o carácter é valido
+            if((table[1][row - disparo_linha - 2][disparo_coluna - 17] >= 49 && table[1][row - disparo_linha - 2][disparo_coluna - 17] <= 56) || (table[1][row - disparo_linha - 2][disparo_coluna - 17] == '-')) {
+            }
+            else {
+                printf("\n*Caracter inválido.");
+                exit(-1);
+            }
         }
-        else if (disparos != 1) { //Modo d2 e d3 (d3 é uma evolução do modo d2)
+        else if (disparos == 2 || disparos == 3) { //Modo d2 e d3 (d3 é uma evolução do modo d2)
             if(sequencia >= 9) {
                 sequencia = 0; // reset do ciclo
                 if(indicador_c > (column/3 - 2)) {
@@ -509,8 +474,127 @@ int modo_j1(int disparos, int jogo) {
                 else {
                     indicador_c ++; } // passa para as proximas 3 colunas
             }
+
+            // conversão
             disparo_linha = ordem[sequencia][0][0] + (indicador_l*3);
             disparo_coluna = ordem[sequencia][1][0] + (indicador_c*3) + 'A';
+
+            if ((disparos == 3) && (table[0][disparo_linha - 2][disparo_coluna - 17] == '-')) {
+                    //printf(" %i %c", disparo_linha - 2, disparo_coluna - 17);
+                //  PRIMEIRAS 3 LINHAS 3,5,8
+                if((indicador_l==0) && (indicador_c>0)) {
+                    switch(sequencia) {
+                case 3: case 8:
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
+                        sequencia++;
+                        break; }
+                    break;
+                case 5:
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
+                        sequencia++;
+                        break; }
+                    break;
+                default:
+                    break;
+                    }
+                }
+                // PRIMEIRAS 3 COLUNAS 1,5,7
+                else if((indicador_l>0) && (indicador_c == 0)) {
+                    switch(sequencia) {
+                case 1: case 7:
+                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Cima & Esquerda
+                        sequencia++;
+                        break; }
+                    break;
+                case 5:
+                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
+                        sequencia++;
+                        break; }
+                    break;
+                default:
+                    break;
+                    }
+                }
+                // RESTO DO TABULEIRO 1,3,4,7,8
+                else if((indicador_l>0) && indicador_c>0) {
+                    switch(sequencia) {
+                case 3:
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
+                        sequencia++;
+                        break; }
+                    break;
+                case 5:
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
+                        sequencia++;
+                        break; }
+                    break;
+                case 1:
+                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
+                        sequencia++;
+                        break; }
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Cima & Esquerda
+                        sequencia++;
+                        break; }
+                    break;
+                case 7:
+                    if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
+                        sequencia++;
+                        break; } // CUIDADO
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Cima & Esquerda
+                        sequencia++;
+                        break;
+                case 8:
+                    if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
+                        sequencia++;
+                        break;}
+                    if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
+                        sequencia++;
+                        break; }
+                    break;
+                default:
+                    break;
+                    }
+                }
+            }
 
             if (sequencia == 9)
                 insurance = 8;
@@ -518,184 +602,41 @@ int modo_j1(int disparos, int jogo) {
             disparo_linha = ordem[sequencia-insurance][0][0] + (indicador_l*3);
             disparo_coluna = ordem[sequencia-insurance][1][0] + (indicador_c*3) + 'A';
             sequencia++; // passa para o proximo quadrado da sequencia pre-definida
-        }
-    }
 
-    //se o utilizador inserir uma coordenada já jogada, conta_pecas não é afetado com a próxima função
-    if (disparos == 1 || jogo == 1) {
-        if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != ' ') {
-            if(table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-'){
-                conta_pecas++;
+            printf("%c%i\n", disparo_coluna, row-disparo_linha);
+            scanf(" %c", &table[1][disparo_linha - 2][disparo_coluna - 17]);
+            table[0][disparo_linha - 2][disparo_coluna - 17] = table[1][disparo_linha - 2][disparo_coluna - 17];
+            // Casos em que o carácter é valido
+            if((table[1][disparo_linha - 2][disparo_coluna - 17] >= 49 && table[1][disparo_linha - 2][disparo_coluna - 17] <= 56) || (table[1][disparo_linha - 2][disparo_coluna - 17] == '-')) {
             }
-        }
-        printf("%c%i\n", disparo_coluna, disparo_linha);
-        scanf(" %c", &table[1][row - disparo_linha - 2][disparo_coluna - 17]);
-        if((table[1][row - disparo_linha - 2][disparo_coluna - 17] >= 49) && (table[1][row - disparo_linha - 2][disparo_coluna - 17] <= 56)) {
-            if('-' == table[1][row - disparo_linha - 2][disparo_coluna - 17]) {
+            else {
                 printf("\n*Caracter inválido.");
                 exit(-1);
             }
-        }
-    }
 
-    if (disparos == 2 || disparos == 3) {
-        printf("%c%i\n", disparo_coluna, row-disparo_linha);
-        scanf(" %c", &table[1][disparo_linha - 2][disparo_coluna - 17]);
-        table[1][disparo_linha - 2][disparo_coluna - 17] = table[0][disparo_linha - 2][disparo_coluna - 17];
-        if((table[1][row - disparo_linha - 2][disparo_coluna - 17] >= 49) && (table[1][row - disparo_linha - 2][disparo_coluna - 17] <= 56)) {
-            if('-' == table[1][disparo_linha - 2][disparo_coluna - 17]) {
-                printf("\n*Caracter inválido.");
-                exit(-1);
-            }
-        }
-
-        if (table[1][disparo_linha - 2][disparo_coluna - 17] != ' ') {
-            if(table[1][disparo_linha - 2][disparo_coluna - 17] != '-'){
-                conta_pecas++;
-            }
-        }
-
-        if (table[1][disparo_linha - 2][disparo_coluna - 17] != '-') {
-            char sinal = table[1][disparo_linha - 2][disparo_coluna - 17];
-            incrementa++;
-            if(incrementa == (sinal - '0')) {
-                incrementa = 0;
-                sequencia = 0;
-                if(indicador_c > (column/3 - 2)) {
-                    indicador_c = 0; // volta para as primeiras 3 colunas
-                    indicador_l ++; } // desce para as proximas 3 linhas
-                else {
-                    indicador_c ++; } // passa para as proximas 3 colunas
-            }
-        }
-
-        if ((disparos == 3) && (table[0][disparo_linha - 2][disparo_coluna - 17] == '-')) {
-            //  PRIMEIRAS 3 LINHAS 3,5,8
-            if((indicador_l==0) && (indicador_c>0)) {
-                switch(sequencia) {
-            case 3: case 8:
-                if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
-                    sequencia++;
-                    break; }
-                break;
-            case 5:
-                if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
-                    sequencia++;
-                    break; }
-                break;
-            default:
-                break;
-                }
-            }
-            // PRIMEIRAS 3 COLUNAS 1,5,7
-            else if((indicador_l>0) && (indicador_c == 0)) {
-                switch(sequencia) {
-            case 1: case 7:
-                if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Cima & Esquerda
-                    sequencia++;
-                    break; }
-                break;
-            case 5:
-                if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
-                    sequencia++;
-                    break; }
-                break;
-            default:
-                break;
-                }
-            }
-            // RESTO DO TABULEIRO 1,3,4,7,8
-            else if((indicador_l>0) && indicador_c>0) {
-                switch(sequencia) {
-            case 3:
-                if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
-                    sequencia++;
-                    break; }
-                break;
-            case 5:
-                if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 1][disparo_coluna - 18] != '-') { // Atras & Baixo
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
-                    sequencia++;
-                    break; }
-                break;
-            case 1:
-                if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 3][disparo_coluna - 16] != '-') { // Cima & Direita
-                    sequencia++;
-                    break; }
-                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Cima & Esquerda
-                    sequencia++;
-                    break; }
-                break;
-            case 7:
-                if(table[0][disparo_linha - 3][disparo_coluna - 17] != '-') { // Cima
-                    sequencia++;
-                    break; } // CUIDADO
-                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') // Cima & Esquerda
-                    sequencia++;
-                    break;
-            case 8:
-                if(table[0][disparo_linha - 2][disparo_coluna - 18] != '-') { // Atras
-                    sequencia++;
-                    break;}
-                if(table[0][disparo_linha - 3][disparo_coluna - 18] != '-') { // Atras & Cima
-                    sequencia++;
-                    break; }
-                break;
-            default:
-                break;
+            if (table[1][disparo_linha - 2][disparo_coluna - 17] != '-') {
+                char sinal = table[1][disparo_linha - 2][disparo_coluna - 17];
+                incrementa++;
+                if(incrementa == (sinal - '0')) {
+                    incrementa = 0;
+                    sequencia = 0;
+                    if(indicador_c > (column/3 - 2)) {
+                        indicador_c = 0; // volta para as primeiras 3 colunas
+                        indicador_l ++; } // desce para as proximas 3 linhas
+                    else {
+                        indicador_c ++; } // passa para as proximas 3 colunas
                 }
             }
         }
     }
     //condição de vitória
-    vitoria = disparo_j1(disparo_linha, disparo_coluna, disparos);
+    vitoria = disparo_j1(disparo_linha, disparo_coluna, disparos, jogo);
     return vitoria;
 }
 
 /**
- *  Nome: modo_jogo, jogo, disparos
+ *  Nome: modo_jogo
  *  Objetivo: escolher modos de jogo
- *
- *  Parametros de entrada: modo_pecas, jogo, disparos
- *  Paremetros de saida: n/a
  */
 
 int modo_jogo(int modo_pecas, int jogo, int disparos) {
@@ -710,7 +651,6 @@ int modo_jogo(int modo_pecas, int jogo, int disparos) {
             }
         }
 
-
         if(jogo == 1)
             printf("* ================================\n* Modo de Jogo 1\n* Insira as Coordenadas de Disparo\n* ================================\n");
 
@@ -720,7 +660,7 @@ int modo_jogo(int modo_pecas, int jogo, int disparos) {
         // Mostra numero de pecas e tamanho do tabuleiro para ambos os modos
         printf("%ix%i", row, column);
         for(i1=1; i1<9; i1++) {
-                printf(" %i", tipo_copy[i1]);
+                printf(" %i", tipo[i1]);
             }
         printf("\n");
 
@@ -746,9 +686,7 @@ int modo_jogo(int modo_pecas, int jogo, int disparos) {
 /**
  *  Nome: menu_ajuda
  *  Objetivo: ajuda ao utilizador, diz ao utilizador os argumentos que deve utilizar para conseguir correr o programa
- *
- *Não tem parâmetros de entrada nem de saida
- */
+*/
 
 void menu_ajuda() {
     printf("Jogo da Batalha Naval.\n\n");
@@ -775,15 +713,14 @@ void menu_ajuda() {
 /**
  *  Nome: main
  *  Objetivo: chamar outras funções, completar o programa
- *
- *  Parametros de entrada: n/a
- *  Paremetros de saida: n/a
  */
 
 int main(int argc, char *argv[]) {
     int modo_pecas,jogo,disparos,i1;
-    int opt = 'h';
+    int opt = 'h', soma = 0, flag = 0, repeticao = 0;
     opterr = 0;
+    time_t t;
+    srand((unsigned) time(&t));
     while((opt=getopt(argc, argv, "t:j:p:d:1:2:3:4:5:6:7:8:h")) != -1){
 
         switch (opt) {
@@ -794,6 +731,9 @@ int main(int argc, char *argv[]) {
                 sscanf(optarg, "%d", &jogo);
                 if (jogo == 2) {
                     modo_pecas = 2;
+                }
+                if (jogo == 1) {
+                    disparos = 0;
                 }
                 break;
             case 'p':
@@ -835,19 +775,40 @@ int main(int argc, char *argv[]) {
                 break;
         }
     }
+
     for(i1=1; i1<=9; i1++) {
-        conta_pecas += tipo[i1]*i1;
+        conta_pecas += tipo[i1]*i1; // conta o número de carácteres números
+        if (i1 != 9) { // caso seja 9, não corre o código abaixo pois sairia dos paramentros do array
+            if(tipo[i1] < tipo[i1+1]) { // restrição de peças do modo posicionamento 2
+                printf("*Número de peças inválido.\n");
+                menu_ajuda();
+                exit(-1);
+            }
+        }
+
+        if(soma > (row*column/18)) { // restrição 4 do modo posicionamento 2
+            soma = 0;
+            printf("*Número de peças inválido.\n");
+            menu_ajuda();
+            exit(-1);
+        }
+        soma += tipo[i1];
     }
-    tipo[0] = (row*column)/9-tipo[1]-tipo[2]-tipo[3]-tipo[4]-tipo[5]-tipo[6]-tipo[7]-tipo[8];
-    modo_pos(modo_pecas, jogo, disparos);
     if((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0)) { //restrição dos tamanhos do tabuleiro
-        printf("*Tabuleiro Inválido\n");
+        printf("*Tabuleiro Inválido.\n");
         menu_ajuda();
-        exit(-1); }
-    // calcula número de células ocupadas por números na matriz
-    //for(i1=1; i1<=9; i1++) {
-    //    conta_pecas += tipo[i1]*i1;
-    //}
+        exit(-1);
+    }
+    tipo[0] = (row*column)/9-tipo[1]-tipo[2]-tipo[3]-tipo[4]-tipo[5]-tipo[6]-tipo[7]-tipo[8]; // conta quantas peças do tipo nulo estão presentes no tabuleiro
+    do {
+        repeticao++;
+        flag = modo_pos(modo_pecas, jogo, disparos, repeticao);
+        if (repeticao == 1000) {
+            printf("*Não foi possível criar o tabuleiro.\n");
+            exit(-1);
+        }
+    } while(flag == -1);
+
     modo_jogo(modo_pecas, jogo, disparos);
     return EXIT_SUCCESS;
 }
