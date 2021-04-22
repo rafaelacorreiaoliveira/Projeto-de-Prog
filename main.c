@@ -405,7 +405,6 @@ char d1_coluna() {
 int disparo_j1(int disparo_linha, char disparo_coluna, int disparos, int jogo) {
     if (disparos == 1 || jogo == 1) {
         if (table[1][row - disparo_linha - 2][disparo_coluna - 17] != '-') {
-            printf("BRUH");
             conta_pecas --;
             if (conta_pecas == 0)
                 return 1;
@@ -652,10 +651,10 @@ int modo_jogo(int modo_pecas, int jogo, int disparos) {
         }
 
         if(jogo == 1)
-            printf("* ================================\n* Modo de Jogo 1\n* Insira as Coordenadas de Disparo\n* ================================\n");
+            printf(" * ================================\n* Modo de Jogo 1\n* Insira as Coordenadas de Disparo\n* ================================\n");
 
         if(jogo == 2)
-            printf("* ================================\n* Modo de Jogo 2\n* Crie um tabuleiro com as características indicadas\n* Responda aos disparos do programa\n* ================================\n");
+            printf(" * ================================\n* Modo de Jogo 2\n* Crie um tabuleiro com as características indicadas\n* Responda aos disparos do programa\n* ================================\n");
 
         // Mostra numero de pecas e tamanho do tabuleiro para ambos os modos
         printf("%ix%i", row, column);
@@ -744,6 +743,8 @@ int main(int argc, char *argv[]) {
                 break;
             case 'd':
                 sscanf(optarg, "%d", &disparos);
+                if (disparos == 1 || disparos == 2 || disparos == 3)
+                    jogo = 2;
                 break;
             case '1':
                 sscanf(optarg, "%d", &tipo[1]);
