@@ -480,7 +480,7 @@ int modo_j1(int disparos, int jogo) {
 
             if ((disparos == 3) && (table[0][disparo_linha - 2][disparo_coluna - 17] == '-')) {
                     //printf(" %i %c", disparo_linha - 2, disparo_coluna - 17);
-                //  PRIMEIRAS 3 LINHAS 3,5,8
+                //  PRIMEIRAS 3 LINHAS 3,5,8asas
                 if((indicador_l==0) && (indicador_c>0)) {
                     switch(sequencia) {
                 case 3: case 8:
@@ -776,25 +776,27 @@ int main(int argc, char *argv[]) {
                 break;
         }
     }
+    if (modo_pecas == 2) {
+        for(i1=1; i1<=9; i1++) {
+            conta_pecas += tipo[i1]*i1; // conta o número de carácteres números
+            if (i1 != 9) { // caso seja 9, não corre o código abaixo pois sairia dos paramentros do array
+                if(tipo[i1] < tipo[i1+1]) { // restrição de peças do modo posicionamento 2
+                    printf("*Número de peças inválido.\n");
+                    menu_ajuda();
+                    exit(-1);
+                }
+            }
 
-    for(i1=1; i1<=9; i1++) {
-        conta_pecas += tipo[i1]*i1; // conta o número de carácteres números
-        if (i1 != 9) { // caso seja 9, não corre o código abaixo pois sairia dos paramentros do array
-            if(tipo[i1] < tipo[i1+1]) { // restrição de peças do modo posicionamento 2
+            if(soma > (row*column/18)) { // restrição 4 do modo posicionamento 2
+                soma = 0;
                 printf("*Número de peças inválido.\n");
                 menu_ajuda();
                 exit(-1);
             }
+            soma += tipo[i1];
         }
-
-        if(soma > (row*column/18)) { // restrição 4 do modo posicionamento 2
-            soma = 0;
-            printf("*Número de peças inválido.\n");
-            menu_ajuda();
-            exit(-1);
-        }
-        soma += tipo[i1];
     }
+
     if((row < 9 || column < 9) || (row > 15 || column > 24) || ((row % 3) != 0) || ((column % 3) != 0)) { //restrição dos tamanhos do tabuleiro
         printf("*Tabuleiro Inválido.\n");
         menu_ajuda();
